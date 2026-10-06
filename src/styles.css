@@ -11,17 +11,22 @@
 html, body, #root { margin: 0; min-height: 100%; width: 100%; }
 body { overflow: hidden; background: #eadfd1; }
 button { font: inherit; }
-.mini-shell { min-height:100svh; width:100%; display:grid; place-items:center; background:radial-gradient(circle at 50% 10%,#fff7ec 0,#eadfd1 46%,#cdbca8 100%); }
-.mini-scene { position:relative; width:min(100vw,540px); height:min(100svh,900px); min-height:640px; overflow:hidden; isolation:isolate; border-radius:38px; box-shadow:0 28px 80px rgba(55,39,31,.22); background:#eadfd1; }
+.mini-shell { min-height:100svh; width:100%; display:grid; place-items:center; background:radial-gradient(circle at 50% 8%,#fffaf3 0,#eadfd1 45%,#c7b5a2 100%); }
+.mini-scene { position:relative; width:min(100vw,560px); height:min(100svh,920px); min-height:640px; overflow:hidden; isolation:isolate; border-radius:38px; box-shadow:0 34px 100px rgba(55,39,31,.25); background:linear-gradient(180deg,#eee3d7 0%,#e5d7c8 58%,#d2bca5 100%); }
 .mini-scene canvas { position:absolute !important; inset:0; }
-.mini-topbar { position:absolute; z-index:5; top:24px; left:24px; right:24px; display:flex; justify-content:space-between; align-items:flex-start; color:#30262a; pointer-events:none; }
+.mini-topbar { position:absolute; z-index:5; top:24px; left:22px; right:22px; display:flex; justify-content:space-between; align-items:flex-start; color:#30262a; pointer-events:none; }
 .eyebrow { display:block; margin-bottom:4px; font-size:10px; font-weight:800; letter-spacing:.18em; opacity:.55; }
-.mini-topbar h1 { margin:0; font-size:30px; letter-spacing:-.04em; }
-.mini-status { display:flex; gap:8px; align-items:center; padding:10px 13px; border:1px solid rgba(255,255,255,.55); border-radius:999px; background:rgba(255,255,255,.42); backdrop-filter:blur(16px); font-size:13px; font-weight:700; }
-.mini-bubble { position:absolute; z-index:5; left:50%; bottom:132px; transform:translateX(-50%); width:max-content; max-width:calc(100% - 48px); padding:12px 17px; border-radius:20px; background:rgba(255,255,255,.72); box-shadow:0 10px 30px rgba(70,46,35,.08); backdrop-filter:blur(18px); font-size:13px; font-weight:650; text-align:center; }
-.mini-actions { position:absolute; z-index:6; left:18px; right:18px; bottom:18px; display:grid; grid-template-columns:repeat(3,1fr); gap:9px; }
-.mini-actions button { min-height:58px; border:0; border-radius:20px; color:#3b3032; background:rgba(255,255,255,.62); box-shadow:0 8px 26px rgba(64,42,30,.08); backdrop-filter:blur(18px); cursor:pointer; font-size:11px; font-weight:750; transition:transform .2s ease,background .2s ease; }
-.mini-actions button:hover { transform:translateY(-2px); background:rgba(255,255,255,.82); }
+.mini-topbar h1 { margin:0; font-size:32px; letter-spacing:-.055em; font-weight:850; }
+.mini-status { display:flex; gap:7px; align-items:center; padding:9px 12px; border:1px solid rgba(255,255,255,.65); border-radius:999px; background:rgba(255,255,255,.5); box-shadow:0 8px 24px rgba(65,45,35,.06); backdrop-filter:blur(18px); font-size:11px; font-weight:650; }
+.mini-bubble { position:absolute; z-index:5; left:50%; bottom:138px; transform:translateX(-50%); width:max-content; max-width:calc(100% - 44px); padding:13px 18px; border:1px solid rgba(255,255,255,.52); border-radius:21px; background:rgba(255,255,255,.68); box-shadow:0 14px 38px rgba(70,46,35,.1); backdrop-filter:blur(20px); font-size:13px; font-weight:650; text-align:center; }
+.mini-actions { position:absolute; z-index:6; left:16px; right:16px; bottom:16px; display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.mini-actions button { min-height:60px; border:1px solid rgba(255,255,255,.46); border-radius:21px; color:#3b3032; background:rgba(255,255,255,.58); box-shadow:0 10px 30px rgba(64,42,30,.09); backdrop-filter:blur(20px); cursor:pointer; font-size:11px; font-weight:750; transition:transform .2s ease,background .2s ease,box-shadow .2s ease; }
+.mini-actions button:hover { transform:translateY(-2px); background:rgba(255,255,255,.82); box-shadow:0 14px 34px rgba(64,42,30,.12); }
 .mini-actions button span { display:block; margin-bottom:3px; font-size:16px; }
 .mini-loading { min-height:100svh; display:grid; place-items:center; color:#5b4a48; background:#eadfd1; font-size:14px; }
 @media (max-width:560px) { .mini-scene { border-radius:0; min-height:100svh; } }
+
+.status-dot { width:7px; height:7px; border-radius:50%; background:#83a56f; box-shadow:0 0 0 4px rgba(131,165,111,.13); }
+.mini-status strong { font-weight:850; margin-left:2px; }
+.bubble-tail { position:absolute; left:50%; bottom:-5px; width:10px; height:10px; transform:translateX(-50%) rotate(45deg); background:rgba(255,255,255,.68); border-right:1px solid rgba(255,255,255,.4); border-bottom:1px solid rgba(255,255,255,.4); }
+@media (max-width:560px) { .mini-scene { border-radius:0; min-height:100svh; } .mini-topbar { top:20px; } }

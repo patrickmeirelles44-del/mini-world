@@ -1,1 +1,34 @@
-# Mini 3D Asset Pipeline\n\nThe app is ready to receive the official Mini character as a GLB.\n\n## Target asset\n- File: /public/mini/mini-official.glb\n- Runtime: Three.js + React Three Fiber + drei useGLTF\n- Prefer a single optimized GLB with PBR materials.\n- Keep the same silhouette and proportions as the current Mini.\n- Include clean topology, UVs and optional idle/blink animations.\n\n## Generation workflow\n1. Create a clean front-facing concept/reference of the Mini.\n2. Generate the 3D model with an image-to-3D tool such as Meshy or Tripo.\n3. Inspect the model and fix proportions/materials.\n4. Export GLB.\n5. Optimize the asset for mobile before adding it to this folder.\n6. Name it mini-official.glb.\n\nAI is used here as an asset-production tool, not as a runtime dependency.\n
+# Mini 3D Asset Pipeline
+
+O projeto trata o personagem como um **sistema 3D**, não como uma imagem.
+
+## DNA oficial
+
+- Direção: **A — Humano Premium**
+- Masculino e feminino usam a mesma linguagem visual.
+- O rig e a silhueta-base são preservados.
+- Foto do usuário gera parâmetros de personalização, não um personagem novo.
+
+## Estrutura
+
+- `public/mini/mini-official.glb` — asset 3D oficial de runtime.
+- `public/mini/reference/` — especificações das referências aprovadas.
+- `public/mini/mini-dna.md` — regras visuais e técnicas.
+- `public/mini/character-spec.json` — contrato estruturado da base.
+- `src/components/MiniCharacterAsset.tsx` — carregador/controlador do GLB e das animações.
+
+## Personalização
+
+O sistema reserva slots para cabelo, cor do cabelo, pele, rosto, roupa, cor da roupa, sapatos e acessórios.
+
+A IA de foto deverá retornar somente parâmetros de personalização.
+
+## Animações
+
+O controlador suporta: `idle`, `blink`, `wave`, `walk`, `run`, `jump`, `land`, `sit`, `stand`, `happy`, `sad`, `curious`, `celebrate`, `interact`, `lookAtCamera`.
+
+O GLB final deve trazer os clips com esses nomes ou aliases compatíveis.
+
+## Próximo asset
+
+O modelo oficial precisa ser exportado como GLB otimizado para mobile. O GLB será conectado ao runtime quando o arquivo final for disponibilizado.

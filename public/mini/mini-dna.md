@@ -2,87 +2,49 @@
 
 ## Regra principal
 
-O Mini NÃO deve ser regenerado do zero para cada usuário.
+O Mini não é regenerado do zero para cada usuário.
 
-Existe uma base 3D oficial com:
-- proporções fixas;
-- esqueleto/rig fixo;
-- mãos, pés, cabeça e corpo compatíveis com todas as animações;
-- materiais PBR premium;
-- expressões faciais compatíveis;
-- pontos de encaixe para cabelo, roupas e acessórios.
+Existe uma **base 3D oficial A — Humano Premium**. O usuário recebe uma instância dessa mesma base e a IA apenas escolhe/ajusta componentes compatíveis.
 
-A personalização troca componentes e parâmetros sobre essa mesma base.
+### O que fica travado
 
-## Direção visual oficial
+- skeleton / rig;
+- proporções corporais;
+- escala;
+- posições das articulações;
+- mãos e pés;
+- silhueta principal;
+- pontos de encaixe;
+- conjunto de animações;
+- qualidade visual e materiais-base.
 
-Escolha: **A — Humano Premium**.
+### O que pode mudar
 
-Características:
-- corpo inteiro;
-- personagem humano estilizado premium;
-- aparência de personagem 3D de animação de alto nível;
-- cabeça levemente maior que a anatomia real, sem virar caricatura extrema;
-- olhos grandes e extremamente expressivos;
-- pele suave com acabamento PBR;
-- cabelo em volumes/mechas 3D;
-- hoodie lilás como outfit-base inicial;
-- calça escura;
-- tênis branco/lilás;
-- mãos e dedos modelados para animação;
-- silhueta limpa e reconhecível;
-- iluminação cinematográfica;
-- nenhum aspecto de avatar genérico, boneco low-poly ou flat.
-
-## Personalização futura
-
-A foto/imagem do usuário serve para inferir características e alterar:
-- cabelo;
-- cor/estilo do cabelo;
-- sobrancelhas;
 - tom de pele;
-- formato e detalhes do rosto dentro dos limites da base;
-- roupa;
-- cores;
-- tênis;
+- cabelo: estilo, volume e cor;
+- sobrancelhas e detalhes faciais;
+- roupa e cor;
+- sapatos e cor;
 - acessórios;
 - pequenos detalhes de identidade.
 
-Não alterar:
-- rig;
-- proporções estruturais;
-- escala do personagem;
-- pontos de articulação;
-- topologia principal;
-- sistema de animação.
+A foto do usuário **não cria outro personagem**. Ela gera parâmetros de personalização para esta base.
+
+## Duas bases oficiais
+
+- Masculino: `mini-base-male`
+- Feminino: `mini-base-female`
+
+As duas devem compartilhar a mesma linguagem visual, escala, qualidade, sistema de materiais, pontos de encaixe e rig de animação compatível. A versão feminina será criada a partir desta especificação, não como um avatar independente.
 
 ## Animações obrigatórias
 
-O rig final deve permitir pelo menos:
-- idle/breathing;
-- blink;
-- wave;
-- walk;
-- run;
-- jump;
-- land;
-- sit;
-- stand;
-- happy;
-- sad;
-- curious;
-- celebrate;
-- interact/touch;
-- look-at-camera.
+`idle`, `blink`, `wave`, `walk`, `run`, `jump`, `land`, `sit`, `stand`, `happy`, `sad`, `curious`, `celebrate`, `interact`, `lookAtCamera`.
 
-## Pipeline
+O runtime já possui um controlador preparado para selecionar esses clips no GLB oficial.
 
-1. Criar o modelo-base masculino oficial.
-2. Criar o modelo-base feminino usando exatamente a mesma linguagem, escala e rig.
-3. Riggar e testar as animações.
-4. Exportar GLB otimizado para mobile.
-5. Separar componentes personalizáveis.
-6. Só depois conectar geração por foto.
-7. A IA deve produzir parâmetros/componentes de personalização, e não substituir o personagem-base.
+## Asset final
 
-Three.js carrega GLB/glTF diretamente e o formato suporta meshes, materiais, skins, morph targets e animações.
+`public/mini/mini-official.glb`
+
+O GLB deve conter rig, materiais PBR, meshes separados por componente quando possível e todos os clips de animação necessários. O formato glTF/GLB é adequado ao runtime porque suporta meshes, materiais, skins, morph targets e animações.

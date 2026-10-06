@@ -1,21 +1,24 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { ContactShadows, Environment, Float, OrbitControls, RoundedBox } from "@react-three/drei";
-import { useRef, useState, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import * as THREE from "three";
 
 function MiniCharacter({ onTap }: { onTap: () => void }) {
   const group = useRef<THREE.Group>(null);
   const [blink, setBlink] = useState(false);
+  const [pulse, setPulse] = useState(0);
 
   useFrame((state) => {
     if (!group.current) return;
     const t = state.clock.elapsedTime;
     group.current.position.y = Math.sin(t * 1.55) * 0.025;
     group.current.rotation.y = Math.sin(t * 0.5) * 0.045;
+    group.current.rotation.x = Math.sin(t * 0.7) * 0.008;
   });
 
   const react = () => {
     onTap();
+    setPulse((value) => value + 1);
     setBlink(true);
     window.setTimeout(() => setBlink(false), 120);
   };
@@ -34,13 +37,13 @@ function MiniCharacter({ onTap }: { onTap: () => void }) {
         </RoundedBox>
 
         {/* head */}
-        <mesh position={[0, 0.52, 0]} scale={[0.92, 0.96, 0.86]}>
+        <mesh position={[0, 0.52, 0]} scale={[0.92, 0.96, 0.86]} castShadow receiveShadow>
           <sphereGeometry args={[0.72, 48, 32]} />
           <meshStandardMaterial color="#e7ad91" roughness={0.5} />
         </mesh>
 
         {/* soft hair cap */}
-        <mesh position={[0, 0.88, -0.02]} scale={[0.78, 0.48, 0.76]}>
+        <mesh position={[0, 0.88, -0.02]} scale={[0.78, 0.48, 0.76]} castShadow>
           <sphereGeometry args={[0.72, 40, 24]} />
           <meshStandardMaterial color="#5b4b55" roughness={0.7} />
         </mesh>
@@ -57,7 +60,7 @@ function MiniCharacter({ onTap }: { onTap: () => void }) {
 
         {/* eyes */}
         {[-0.23, 0.23].map((x) => (
-          <group key={x} position={[x, 0.54, 0.66]}>
+          <group key={x} position={[x, 0.54, 0.66]} scale={1 + (pulse % 2 === 0 ? 0 : 0.025)}>
             <mesh scale={[0.105, blink ? 0.012 : 0.14, 0.055]}>
               <sphereGeometry args={[1, 24, 16]} />
               <meshStandardMaterial color="#29232a" roughness={0.24} />
@@ -104,23 +107,23 @@ function MiniCharacter({ onTap }: { onTap: () => void }) {
 function Room() {
   return (
     <group>
-      <RoundedBox args={[5.8, 0.18, 4.4]} radius={0.08} smoothness={3} position={[0, -1.18, 0]}>
+      <RoundedBox args={[5.8, 0.18, 4.4]} radius={0.08} smoothness={3} position={[0, -1.18, 0]} receiveShadow>
         <meshStandardMaterial color="#d4bfa9" roughness={0.84} />
       </RoundedBox>
-      <mesh position={[0, 1.0, -1.45]} scale={[3.5, 2.5, 1]}>
+      <mesh position={[0, 1.0, -1.45]} scale={[3.5, 2.5, 1]} receiveShadow>
         <planeGeometry args={[2, 2]} />
         <meshStandardMaterial color="#f2e6d8" roughness={0.92} />
       </mesh>
-      <RoundedBox args={[2.9, 0.35, 1.25]} radius={0.16} smoothness={5} position={[0, -0.88, -0.35]}>
+      <RoundedBox args={[2.9, 0.35, 1.25]} radius={0.16} smoothness={5} position={[0, -0.88, -0.35]} castShadow>
         <meshStandardMaterial color="#b58c76" roughness={0.78} />
       </RoundedBox>
       <RoundedBox args={[2.5, 0.16, 1.02]} radius={0.1} smoothness={5} position={[0, -0.67, -0.35]}>
         <meshStandardMaterial color="#e8cdb9" roughness={0.86} />
       </RoundedBox>
-      <RoundedBox args={[0.72, 0.38, 0.48]} radius={0.12} smoothness={5} position={[-1.65, -0.79, -0.5]}>
+      <RoundedBox args={[0.72, 0.38, 0.48]} radius={0.12} smoothness={5} position={[-1.65, -0.79, -0.5]} castShadow>
         <meshStandardMaterial color="#d7a1a1" roughness={0.82} />
       </RoundedBox>
-      <RoundedBox args={[0.55, 0.72, 0.55]} radius={0.1} smoothness={5} position={[1.7, -0.71, -0.5]}>
+      <RoundedBox args={[0.55, 0.72, 0.55]} radius={0.1} smoothness={5} position={[1.7, -0.71, -0.5]} castShadow>
         <meshStandardMaterial color="#a7b89e" roughness={0.78} />
       </RoundedBox>
     </group>
@@ -129,15 +132,15 @@ function Room() {
 
 function Scene({ onTap }: { onTap: () => void }) {
   return (
-    <Canvas shadows camera={{ position: [0, 0.25, 6.4], fov: 34 }} dpr={[1, 2]} gl={{ antialias: true }}>
+    <Canvas shadows camera={{ position: [0, 0.15, 6.2], fov: 32 }} dpr={[1, 2]} gl={{ antialias: true, powerPreference: "high-performance" }}>
       <color attach="background" args={["#eadfd1"]} />
-      <ambientLight intensity={1.45} />
-      <directionalLight position={[-3.5, 5.5, 4]} intensity={3.5} castShadow shadow-mapSize={[2048, 2048]} />
-      <pointLight position={[3, 1.8, 2]} intensity={1.8} color="#ffd4ad" />
-      <pointLight position={[-3, 1.5, 1]} intensity={1.2} color="#c9d8ff" />
+      <ambientLight intensity={1.05} />
+      <directionalLight position={[-3.5, 5.5, 4]} intensity={4.2} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.00015} />
+      <pointLight position={[3, 2.4, 2]} intensity={2.2} color="#ffd4ad" />
+      <pointLight position={[-3, 1.5, 1]} intensity={1.45} color="#c9d8ff" />
       <Room />
       <MiniCharacter onTap={onTap} />
-      <ContactShadows position={[0, -1.16, 0]} opacity={0.34} scale={4.6} blur={2.6} far={2.7} />
+      <ContactShadows position={[0, -1.16, 0]} opacity={0.42} scale={5.2} blur={2.8} far={3.2} />
       <Environment preset="apartment" />
       <OrbitControls enablePan={false} enableZoom={false} minPolarAngle={Math.PI / 2.5} maxPolarAngle={Math.PI / 1.92} />
     </Canvas>
@@ -147,6 +150,7 @@ function Scene({ onTap }: { onTap: () => void }) {
 export function MiniWorld({ children }: { children?: ReactNode }) {
   const [message, setMessage] = useState("Oi. Eu sou o seu Mini.");
   const [mood, setMood] = useState(82);
+  const status = useMemo(() => mood > 90 ? "radiante" : mood > 70 ? "feliz" : "quietinho", [mood]);
 
   const reactToMini = () => {
     setMood((value) => Math.min(100, value + 3));
@@ -163,9 +167,9 @@ export function MiniWorld({ children }: { children?: ReactNode }) {
             <span className="eyebrow">SEU MINI</span>
             <h1>Lumi</h1>
           </div>
-          <div className="mini-status"><span>☀️</span><span>{mood}%</span></div>
+          <div className="mini-status"><span className="status-dot" /> <span>{status}</span><strong>{mood}%</strong></div>
         </div>
-        <div className="mini-bubble">{message}</div>
+        <div className="mini-bubble"><span className="bubble-tail" />{message}</div>
         <div className="mini-actions">
           <button onClick={() => setMessage("Vamos brincar? 🎈")}><span>✦</span>Brincar</button>
           <button onClick={() => setMessage("Ainda estamos nos conhecendo. 💜")}><span>◌</span>Conversar</button>

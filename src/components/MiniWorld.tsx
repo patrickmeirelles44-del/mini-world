@@ -1,5 +1,5 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, Environment, Float, OrbitControls, RoundedBox, useGLTF } from "@react-three/drei";
+import { ContactShadows, Environment, Float, OrbitControls, RoundedBox } from "@react-three/drei";
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import * as THREE from "three";
 
@@ -104,7 +104,7 @@ function MiniCharacter({ onTap }: { onTap: () => void }) {
   );
 }
 
-function MiniGLB({ onTap }: { onTap: () => void }) {\n  const { scene } = useGLTF("/mini/mini-official.glb");\n  const group = useRef<THREE.Group>(null);\n  useFrame((state) => {\n    if (!group.current) return;\n    const t = state.clock.elapsedTime;\n    group.current.position.y = Math.sin(t * 1.4) * 0.025;\n    group.current.rotation.y = Math.sin(t * 0.45) * 0.04;\n  });\n  return (\n    <group ref={group} position={[0, -1.0, 0]} scale={1.45} onClick={onTap}>\n      <primitive object={scene} />\n    </group>\n  );\n}\n\nfunction Room() {
+function Room() {
   return (
     <group>
       <RoundedBox args={[5.8, 0.18, 4.4]} radius={0.08} smoothness={3} position={[0, -1.18, 0]} receiveShadow>

@@ -43,15 +43,26 @@ function recolor(root: THREE.Object3D, tokens: string[], color?: string) {
 }
 
 export function MiniCharacterAsset({
-  onTap, animation = "idle", customization = {},
+  onTap, animation = "idle", customization = {}, modelUrl = "/mini/mini-official.glb",
 }: {
   onTap?: () => void;
   animation?: MiniAnimation;
   customization?: MiniCustomization;
+  modelUrl?: string;
 }) {
   const group = useRef<THREE.Group>(null);
-  const { scene, animations } = useGLTF("/mini/mini-official.glb");
+  const { scene, animations } = useGLTF(modelUrl);
   const { actions } = useAnimations(animations, group);
+
+  useEffect(() => {
+    if (!group.current) return;
+    const box = new THREE.Box3().setFromObject(scene);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    const scale = size.y > 0 ? 2.55 / size.y : 1;
+    group.current.scale.setScalar(scale);
+    group.current.position.set(-center.x * scale, -1.15 - center.y * scale, -center.z * scale);
+  }, [scene]);
 
   useEffect(() => {
     const action = findAction(actions, animation);

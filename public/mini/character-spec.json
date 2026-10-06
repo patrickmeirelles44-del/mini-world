@@ -1,0 +1,51 @@
+{
+  "version": "1.0",
+  "base": "human-premium-A",
+  "principle": "same_base_skeleton_personalized_components",
+  "variants": {
+    "male": {
+      "reference": "mini-base-male",
+      "status": "reference-approved"
+    },
+    "female": {
+      "reference": "mini-base-female",
+      "status": "reference-to-create"
+    }
+  },
+  "customizable": [
+    "skinTone",
+    "hairStyle",
+    "hairColor",
+    "eyebrows",
+    "faceDetails",
+    "outfit",
+    "outfitColor",
+    "shoes",
+    "accessories"
+  ],
+  "locked": [
+    "skeleton",
+    "animationRig",
+    "bodyScale",
+    "jointLocations",
+    "coreSilhouette"
+  ],
+  "animations": [
+    "idle",
+    "blink",
+    "wave",
+    "walk",
+    "run",
+    "jump",
+    "land",
+    "sit",
+    "stand",
+    "happy",
+    "sad",
+    "curious",
+    "celebrate",
+    "interact",
+    "lookAtCamera"
+  ],
+  "targetAsset": "public/mini/mini-official.glb"
+}

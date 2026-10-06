@@ -8,7 +8,10 @@ export const Route = createFileRoute("/api/mini/status")({
       POST: async ({ request }) => {
         const apiKey = process.env.RODIN_API_KEY;
         if (!apiKey) {
-          return Response.json({ error: "RODIN_API_KEY is not configured on the server." }, { status: 503 });
+          return Response.json(
+            { error: "RODIN_API_KEY is not configured on the server." },
+            { status: 503 },
+          );
         }
 
         const body = await request.json().catch(() => null);
@@ -28,19 +31,34 @@ export const Route = createFileRoute("/api/mini/status")({
         });
 
         const data = await response.json().catch(() => null);
+
         if (!response.ok) {
-          return Response.json({ error: data?.message || "Could not read Rodin status." }, { status: response.status });
+          return Response.json(
+            { error: data?.message || "Nao foi possivel consultar a geracao." },
+            { status: response.status },
+          );
         }
 
         const jobs = Array.isArray(data?.jobs) ? data.jobs : [];
-        const states = jobs.map((job: { status?: string }) => job.status).filter(Boolean);
-        const status = states.includes("Failed")
-          ? "failed"
-          : states.length > 0 && states.every((value: string) => value === "Done")
-            ? "done"
-            : "processing";
+        const states = jobs
+          .map((job: { status?: string }) => job.status)
+          .filter((value): value is string => Boolean(value));
 
-        return Response.json({ status, jobs });
+        const status =
+          states.includes("Failed")
+            ? "failed"
+            : states.length > 0 && states.every((value) => value === "Done")
+              ? "done"
+              : "processing";
+
+        return Response.json({
+          status,
+          jobs: jobs.map((job: { status?: string; error?: string; message?: string }) => ({
+            status: job.status,
+            error: job.error,
+            message: job.message,
+          })),
+        });
       },
     },
   },

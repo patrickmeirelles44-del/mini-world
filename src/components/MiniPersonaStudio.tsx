@@ -35,6 +35,7 @@ function fileKey(file: File) {
 export function MiniPersonaStudio({ onModelReady }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const previewUrlsRef = useRef<string[]>([]);
+  const requestControllerRef = useRef<AbortController | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [state, setState] = useState<GenerationState>("idle");
@@ -42,15 +43,25 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
+    const urls = files.map((file) => URL.createObjectURL(file));
+    previewUrlsRef.current = urls;
+    setPreviewUrls(urls);
+
     return () => {
-      previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
+      urls.forEach((url) => URL.revokeObjectURL(url));
+      if (previewUrlsRef.current === urls) previewUrlsRef.current = [];
+    };
+  }, [files]);
+
+  useEffect(() => {
+    return () => {
+      requestControllerRef.current?.abort();
     };
   }, []);
 
   const chooseFiles = (selected: FileList | null) => {
     if (!selected?.length) return;
 
-    // Copy the FileList immediately. Safari/iOS owns the live FileList.
     const picked = Array.from(selected);
     if (inputRef.current) inputRef.current.value = "";
 
@@ -61,28 +72,17 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
       (file) => !file.type.startsWith("image/") || file.size > MAX_FILE_SIZE,
     );
 
-    // Selecting photos again adds them instead of silently replacing the previous selection.
     setFiles((current) => {
       const existing = new Set(current.map(fileKey));
       const additions = valid.filter((file) => !existing.has(fileKey(file)));
       const next = [...current, ...additions].slice(0, MAX_FILES);
-
-      setPreviewUrls((currentUrls) => {
-        currentUrls.forEach((url) => URL.revokeObjectURL(url));
-        const urls = next.map((file) => URL.createObjectURL(file));
-        previewUrlsRef.current = urls;
-        return urls;
-      });
-
-      setState("idle");
-      setProgress(0);
 
       if (rejected.length) {
         setMessage("Algumas fotos foram ignoradas. Use imagens de até 25 MB.");
       } else if (additions.length === 0) {
         setMessage("Essas fotos já estão selecionadas.");
       } else if (next.length === MAX_FILES && current.length + additions.length > MAX_FILES) {
-        setMessage(`Limite de ${MAX_FILES} fotos atingido. As primeiras ${MAX_FILES} serão usadas.`);
+        setMessage(`Limite de ${MAX_FILES} fotos atingido.`);
       } else if (next.length > 1) {
         setMessage(`${next.length} fotos selecionadas — quanto mais ângulos, melhor.`);
       } else {
@@ -91,31 +91,16 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
 
       return next;
     });
+
+    setState("idle");
+    setProgress(0);
   };
 
   const removeFile = (index: number) => {
-    setFiles((current) => {
-      const next = current.filter((_, fileIndex) => fileIndex !== index);
-
-      setPreviewUrls((currentUrls) => {
-        currentUrls.forEach((url) => URL.revokeObjectURL(url));
-        const urls = next.map((file) => URL.createObjectURL(file));
-        previewUrlsRef.current = urls;
-        return urls;
-      });
-
-      setState("idle");
-      setProgress(0);
-      setMessage(
-        next.length > 1
-          ? `${next.length} fotos selecionadas.`
-          : next.length === 1
-            ? "1 foto selecionada."
-            : "Escolha pelo menos 1 foto.",
-      );
-
-      return next;
-    });
+    setFiles((current) => current.filter((_, fileIndex) => fileIndex !== index));
+    setState("idle");
+    setProgress(0);
+    setMessage("Foto removida.");
   };
 
   const generate = async () => {
@@ -128,6 +113,9 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
     setProgress(8);
     setMessage(`Enviando ${files.length} ${files.length === 1 ? "foto" : "fotos"}…`);
 
+    const controller = new AbortController();
+    requestControllerRef.current = controller;
+
     try {
       const body = new FormData();
       files.forEach((file) => body.append("images", file, file.name));
@@ -136,6 +124,7 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
         method: "POST",
         headers: supabaseHeaders(),
         body,
+        signal: controller.signal,
       });
 
       const created = await createResponse.json().catch(() => ({}));
@@ -163,6 +152,7 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
           body: JSON.stringify({
             subscriptionKey: created.subscriptionKey,
           }),
+          signal: controller.signal,
         });
 
         const status = await statusResponse.json().catch(() => ({}));
@@ -189,6 +179,7 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
             body: JSON.stringify({
               taskUuid: created.taskUuid,
             }),
+            signal: controller.signal,
           });
 
           const downloaded = await downloadResponse.json().catch(() => ({}));
@@ -211,9 +202,12 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
 
       throw new Error("A geração demorou mais que o esperado. Tente novamente.");
     } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
       setState("error");
       setProgress(0);
       setMessage(error instanceof Error ? error.message : "Algo deu errado.");
+    } finally {
+      if (requestControllerRef.current === controller) requestControllerRef.current = null;
     }
   };
 

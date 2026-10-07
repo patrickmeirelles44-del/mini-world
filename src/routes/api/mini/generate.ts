@@ -9,7 +9,7 @@ export const Route = createFileRoute("/api/mini/generate")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.RODIN_API_KEY;
+        const apiKey = process.env["RODIN_API_KEY"];
         if (!apiKey) {
           return Response.json(
             { error: "RODIN_API_KEY is not configured on the server." },
@@ -75,7 +75,7 @@ export const Route = createFileRoute("/api/mini/generate")({
           : files.map((_, index) => IMAGE_LABELS[Math.min(index, IMAGE_LABELS.length - 1)]);
 
         for (const label of safeLabels) {
-          payload.append("image_label", label);
+          payload.append("image_label", label ?? "?");
         }
 
         const response = await fetch(RODIN_URL, {

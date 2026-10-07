@@ -6,7 +6,7 @@ export const Route = createFileRoute("/api/mini/status")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.RODIN_API_KEY;
+        const apiKey = process.env["RODIN_API_KEY"];
         if (!apiKey) {
           return Response.json(
             { error: "RODIN_API_KEY is not configured on the server." },
@@ -42,12 +42,12 @@ export const Route = createFileRoute("/api/mini/status")({
         const jobs = Array.isArray(data?.jobs) ? data.jobs : [];
         const states = jobs
           .map((job: { status?: string }) => job.status)
-          .filter((value): value is string => Boolean(value));
+          .filter((value: unknown): value is string => Boolean(value));
 
         const status =
           states.includes("Failed")
             ? "failed"
-            : states.length > 0 && states.every((value) => value === "Done")
+            : states.length > 0 && states.every((value: string) => value === "Done")
               ? "done"
               : "processing";
 

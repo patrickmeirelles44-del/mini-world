@@ -10,33 +10,102 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiMiniDownloadRouteImport } from './routes/api/mini/download'
+import { Route as ApiMiniGenerateRouteImport } from './routes/api/mini/generate'
+import { Route as ApiMiniStatusRouteImport } from './routes/api/mini/status'
+import { Route as ApiRodinGenerateRouteImport } from './routes/api/rodin.generate'
+import { Route as ApiRodinStatusRouteImport } from './routes/api/rodin.status'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMiniDownloadRoute = ApiMiniDownloadRouteImport.update({
+  id: '/api/mini/download',
+  path: '/api/mini/download',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMiniGenerateRoute = ApiMiniGenerateRouteImport.update({
+  id: '/api/mini/generate',
+  path: '/api/mini/generate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMiniStatusRoute = ApiMiniStatusRouteImport.update({
+  id: '/api/mini/status',
+  path: '/api/mini/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRodinGenerateRoute = ApiRodinGenerateRouteImport.update({
+  id: '/api/rodin/generate',
+  path: '/api/rodin/generate',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRodinStatusRoute = ApiRodinStatusRouteImport.update({
+  id: '/api/rodin/status',
+  path: '/api/rodin/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/mini/download': typeof ApiMiniDownloadRoute
+  '/api/mini/generate': typeof ApiMiniGenerateRoute
+  '/api/mini/status': typeof ApiMiniStatusRoute
+  '/api/rodin/generate': typeof ApiRodinGenerateRoute
+  '/api/rodin/status': typeof ApiRodinStatusRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/mini/download': typeof ApiMiniDownloadRoute
+  '/api/mini/generate': typeof ApiMiniGenerateRoute
+  '/api/mini/status': typeof ApiMiniStatusRoute
+  '/api/rodin/generate': typeof ApiRodinGenerateRoute
+  '/api/rodin/status': typeof ApiRodinStatusRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/mini/download': typeof ApiMiniDownloadRoute
+  '/api/mini/generate': typeof ApiMiniGenerateRoute
+  '/api/mini/status': typeof ApiMiniStatusRoute
+  '/api/rodin/generate': typeof ApiRodinGenerateRoute
+  '/api/rodin/status': typeof ApiRodinStatusRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/api/mini/download'
+    | '/api/mini/generate'
+    | '/api/mini/status'
+    | '/api/rodin/generate'
+    | '/api/rodin/status'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/api/mini/download'
+    | '/api/mini/generate'
+    | '/api/mini/status'
+    | '/api/rodin/generate'
+    | '/api/rodin/status'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/mini/download'
+    | '/api/mini/generate'
+    | '/api/mini/status'
+    | '/api/rodin/generate'
+    | '/api/rodin/status'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiMiniDownloadRoute: typeof ApiMiniDownloadRoute
+  ApiMiniGenerateRoute: typeof ApiMiniGenerateRoute
+  ApiMiniStatusRoute: typeof ApiMiniStatusRoute
+  ApiRodinGenerateRoute: typeof ApiRodinGenerateRoute
+  ApiRodinStatusRoute: typeof ApiRodinStatusRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +117,51 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/mini/download': {
+      id: '/api/mini/download'
+      path: '/api/mini/download'
+      fullPath: '/api/mini/download'
+      preLoaderRoute: typeof ApiMiniDownloadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mini/generate': {
+      id: '/api/mini/generate'
+      path: '/api/mini/generate'
+      fullPath: '/api/mini/generate'
+      preLoaderRoute: typeof ApiMiniGenerateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mini/status': {
+      id: '/api/mini/status'
+      path: '/api/mini/status'
+      fullPath: '/api/mini/status'
+      preLoaderRoute: typeof ApiMiniStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/rodin/generate': {
+      id: '/api/rodin/generate'
+      path: '/api/rodin/generate'
+      fullPath: '/api/rodin/generate'
+      preLoaderRoute: typeof ApiRodinGenerateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/rodin/status': {
+      id: '/api/rodin/status'
+      path: '/api/rodin/status'
+      fullPath: '/api/rodin/status'
+      preLoaderRoute: typeof ApiRodinStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiMiniDownloadRoute: ApiMiniDownloadRoute,
+  ApiMiniGenerateRoute: ApiMiniGenerateRoute,
+  ApiMiniStatusRoute: ApiMiniStatusRoute,
+  ApiRodinGenerateRoute: ApiRodinGenerateRoute,
+  ApiRodinStatusRoute: ApiRodinStatusRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

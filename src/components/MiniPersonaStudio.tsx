@@ -57,9 +57,9 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
       while (Date.now() - started < deadline) {
         await new Promise((resolve) => window.setTimeout(resolve, 6000));
 
-        const statusResponse = await fetch("/api/mini/status", {
+        const statusResponse = await fetch(MINI_PERSONA_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "x-mini-action": "status" },
           body: JSON.stringify({ subscriptionKey: created.subscriptionKey }),
         });
         const status = await statusResponse.json();

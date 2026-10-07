@@ -1,15 +1,16 @@
-name: Sync and deploy Supabase Edge Function
+name: Deploy Supabase Edge Function
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - 'supabase/**'
+      - 'supabase/functions/mini-persona/**'
+      - 'supabase/config.toml'
       - '.github/workflows/deploy-supabase.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   deploy:
@@ -19,23 +20,8 @@ jobs:
       SUPABASE_PROJECT_ID: ujohhylcrkyoqhkpnhyt
     steps:
       - uses: actions/checkout@v4
-
       - uses: supabase/setup-cli@v1
         with:
           version: latest
-
-      - name: Download current remote function
-        run: |
-          rm -rf supabase/functions/mini-persona
-          supabase functions download mini-persona --project-ref "$SUPABASE_PROJECT_ID" --use-api
-
-      - name: Commit downloaded function source
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add supabase/functions/mini-persona
-          git diff --cached --quiet || git commit -m "chore: sync mini-persona edge function source"
-          git push
-
-      - name: Deploy function
-        run: supabase functions deploy mini-persona --project-ref "$SUPABASE_PROJECT_ID" --use-api
+      - name: Deploy mini-persona
+        run: supabase functions deploy mini-persona --project-ref "$SUPABASE_PROJECT_ID" --use-api --no-verify-jwt

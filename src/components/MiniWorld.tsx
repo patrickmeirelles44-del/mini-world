@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber";
 import { ContactShadows, Environment, Float, OrbitControls, RoundedBox } from "@react-three/drei";
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import { MiniCharacterAsset } from "@/components/MiniCharacterAsset";
 import { MiniPersonaStudio } from "@/components/MiniPersonaStudio";
 
@@ -59,24 +59,42 @@ function Room() {
 
 function Scene({ onTap, modelUrl }: { onTap: () => void; modelUrl: string | null }) {
   return (
-    <Canvas shadows camera={{ position: [0, 0.15, 6.2], fov: 32 }} dpr={[1, 2]} gl={{ antialias: true, powerPreference: "high-performance" }}>
+    <Canvas
+      shadows={{ type: "PCFSoftShadowMap", autoUpdate: true }}
+      camera={{ position: [0, 0.15, 6.2], fov: 32 }}
+      dpr={[1, 1.5]}
+      performance={{ min: 0.6, max: 1, debounce: 300 }}
+      gl={{ antialias: true, powerPreference: "high-performance", alpha: false }}
+    >
       <color attach="background" args={["#eadfd1"]} />
-      <ambientLight intensity={1.05} />
-      <directionalLight position={[-3.5, 5.5, 4]} intensity={4.2} castShadow />
-      <pointLight position={[3, 2.4, 2]} intensity={2.2} color="#ffd4ad" />
-      <pointLight position={[-3, 1.5, 1]} intensity={1.45} color="#c9d8ff" />
+      <ambientLight intensity={0.9} />
+      <directionalLight
+        position={[-3.5, 5.5, 4]}
+        intensity={3.2}
+        castShadow
+        shadow-mapSize={[1024, 1024]}
+      />
+      <pointLight position={[3, 2.4, 2]} intensity={1.5} color="#ffd4ad" />
       <Room />
       <Float speed={1.05} rotationIntensity={0.018} floatIntensity={0.025}>
         {modelUrl ? <MiniCharacterAsset modelUrl={modelUrl} onTap={onTap} /> : <FallbackMini onTap={onTap} />}
       </Float>
-      <ContactShadows position={[0, -1.16, 0]} opacity={0.42} scale={5.2} blur={2.8} far={3.2} />
-      <Environment preset="apartment" />
+      <ContactShadows
+        position={[0, -1.16, 0]}
+        opacity={0.3}
+        scale={5.2}
+        blur={2.4}
+        far={3.2}
+        resolution={256}
+      />
+      <Environment preset="apartment" environmentIntensity={0.45} />
       <OrbitControls enablePan={false} enableZoom={false} minPolarAngle={Math.PI / 2.5} maxPolarAngle={Math.PI / 1.92} />
     </Canvas>
   );
 }
 
 export function MiniWorld({ children }: { children?: ReactNode }) {
+  const messageTimer = useRef<number | null>(null);
   const [message, setMessage] = useState("Oi. Eu sou o seu Mini.");
   const [mood, setMood] = useState(82);
   const [modelUrl, setModelUrl] = useState<string | null>(null);
@@ -86,7 +104,11 @@ export function MiniWorld({ children }: { children?: ReactNode }) {
   const reactToMini = () => {
     setMood((value) => Math.min(100, value + 3));
     setMessage("Hehe! Você me tocou. ✨");
-    window.setTimeout(() => setMessage("Estou gostando de morar aqui."), 1400);
+    if (messageTimer.current) window.clearTimeout(messageTimer.current);
+    messageTimer.current = window.setTimeout(
+      () => setMessage("Estou gostando de morar aqui."),
+      1400,
+    );
   };
 
   return (

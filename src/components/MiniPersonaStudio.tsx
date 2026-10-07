@@ -80,7 +80,7 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
       const body = new FormData();
       files.forEach((file) => body.append("images", file, file.name));
 
-      const createResponse = await fetch(MINI_PERSONA_URL, {
+      const createResponse = await fetch(`${MINI_PERSONA_URL}?action=generate`, {
         method: "POST",
         headers: {
           apikey: SUPABASE_PUBLISHABLE_KEY,
@@ -108,7 +108,7 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
       while (Date.now() - started < deadline) {
         await new Promise((resolve) => window.setTimeout(resolve, 6000));
 
-        const statusResponse = await fetch(MINI_PERSONA_URL, {
+        const statusResponse = await fetch(`${MINI_PERSONA_URL}?action=status`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -138,7 +138,7 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
           setProgress(92);
           setMessage("Aplicando materiais e preparando seu Mini…");
 
-          const downloadResponse = await fetch(MINI_PERSONA_URL, {
+          const downloadResponse = await fetch(`${MINI_PERSONA_URL}?action=download`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

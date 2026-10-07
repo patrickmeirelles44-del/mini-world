@@ -33,7 +33,9 @@ function actionFrom(req: Request) {
 }
 
 async function rodinFetch(path: string, init: RequestInit = {}, timeoutMs = RODIN_TIMEOUT_MS) {
-  const key = Deno.env.get('RODIN_API_KEY')
+  const key = (Deno.env.get('RODIN_API_KEY') ?? '')
+    .trim()
+    .replace(/^Bearer\\s+/i, '')
   if (!key) throw new Error('RODIN_API_KEY não configurada no Supabase.')
 
   const headers = new Headers(init.headers)
@@ -104,13 +106,28 @@ Deno.serve(async (req) => {
       const response = await rodinFetch('/rodin', { method: 'POST', body: form })
       const data = await response.json().catch(() => ({}))
 
-      if (!response.ok || data.error || !data.uuid || !data.jobs?.subscription_key) {
+      if (!response.ok) {
+        const upstreamStatus = response.status
         return json(
           {
-            error: data.message || data.error || 'Hyper3D não aceitou a geração.',
+            error: upstreamStatus === 401
+              ? 'HYPER3D_AUTH: a chave RODIN_API_KEY foi rejeitada pelo Hyper3D.'
+              : upstreamStatus === 403
+                ? 'HYPER3D_ACCESS: a chave não tem acesso/subscrição necessária no Hyper3D.'
+                : data.message || data.error || 'Hyper3D não aceitou a geração.',
             details: data,
           },
-          response.status || 502,
+          502,
+        )
+      }
+
+      if (data.error || !data.uuid || !data.jobs?.subscription_key) {
+        return json(
+          {
+            error: data.message || data.error || 'Hyper3D não retornou uma tarefa válida.',
+            details: data,
+          },
+          502,
         )
       }
 
@@ -148,7 +165,7 @@ Deno.serve(async (req) => {
             error: data.message || data.error || 'Falha ao consultar o Hyper3D.',
             details: data,
           },
-          response.status,
+          502,
         )
       }
 
@@ -194,7 +211,7 @@ Deno.serve(async (req) => {
             error: data.message || data.error || 'Falha ao obter o modelo.',
             details: data,
           },
-          response.status,
+          502,
         )
       }
 

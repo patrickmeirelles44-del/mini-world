@@ -28,6 +28,10 @@ function errorMessage(payload: unknown, fallback: string) {
   return fallback;
 }
 
+function fileKey(file: File) {
+  return `${file.name}:${file.size}:${file.lastModified}`;
+}
+
 export function MiniPersonaStudio({ onModelReady }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const previewUrlsRef = useRef<string[]>([]);
@@ -40,39 +44,78 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
   useEffect(() => {
     return () => {
       previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
-      if (inputRef.current) inputRef.current.value = "";
     };
   }, []);
 
   const chooseFiles = (selected: FileList | null) => {
-    if (!selected) return;
+    if (!selected?.length) return;
 
-    const rejected = Array.from(selected).filter(
+    // Copy the FileList immediately. Safari/iOS owns the live FileList.
+    const picked = Array.from(selected);
+    if (inputRef.current) inputRef.current.value = "";
+
+    const valid = picked.filter(
+      (file) => file.type.startsWith("image/") && file.size <= MAX_FILE_SIZE,
+    );
+    const rejected = picked.filter(
       (file) => !file.type.startsWith("image/") || file.size > MAX_FILE_SIZE,
     );
 
-    const next = Array.from(selected)
-      .filter((file) => file.type.startsWith("image/") && file.size <= MAX_FILE_SIZE)
-      .slice(0, MAX_FILES);
+    // Selecting photos again adds them instead of silently replacing the previous selection.
+    setFiles((current) => {
+      const existing = new Set(current.map(fileKey));
+      const additions = valid.filter((file) => !existing.has(fileKey(file)));
+      const next = [...current, ...additions].slice(0, MAX_FILES);
 
-    previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
-    const urls = next.map((file) => URL.createObjectURL(file));
-    previewUrlsRef.current = urls;
+      setPreviewUrls((currentUrls) => {
+        currentUrls.forEach((url) => URL.revokeObjectURL(url));
+        const urls = next.map((file) => URL.createObjectURL(file));
+        previewUrlsRef.current = urls;
+        return urls;
+      });
 
-    setFiles(next);
-    setPreviewUrls(urls);
-    setState("idle");
-    setProgress(0);
+      setState("idle");
+      setProgress(0);
 
-    if (rejected.length) {
-      setMessage("Algumas fotos foram ignoradas. Use JPG, PNG ou WebP de até 25 MB.");
-    } else if (next.length > 1) {
-      setMessage(`${next.length} fotos selecionadas — quanto mais ângulos, melhor.`);
-    } else if (next.length === 1) {
-      setMessage("1 foto selecionada. Uma foto já é suficiente para começar.");
-    } else {
-      setMessage("Escolha pelo menos 1 foto.");
-    }
+      if (rejected.length) {
+        setMessage("Algumas fotos foram ignoradas. Use imagens de até 25 MB.");
+      } else if (additions.length === 0) {
+        setMessage("Essas fotos já estão selecionadas.");
+      } else if (next.length === MAX_FILES && current.length + additions.length > MAX_FILES) {
+        setMessage(`Limite de ${MAX_FILES} fotos atingido. As primeiras ${MAX_FILES} serão usadas.`);
+      } else if (next.length > 1) {
+        setMessage(`${next.length} fotos selecionadas — quanto mais ângulos, melhor.`);
+      } else {
+        setMessage("1 foto selecionada. Uma foto já é suficiente para começar.");
+      }
+
+      return next;
+    });
+  };
+
+  const removeFile = (index: number) => {
+    setFiles((current) => {
+      const next = current.filter((_, fileIndex) => fileIndex !== index);
+
+      setPreviewUrls((currentUrls) => {
+        currentUrls.forEach((url) => URL.revokeObjectURL(url));
+        const urls = next.map((file) => URL.createObjectURL(file));
+        previewUrlsRef.current = urls;
+        return urls;
+      });
+
+      setState("idle");
+      setProgress(0);
+      setMessage(
+        next.length > 1
+          ? `${next.length} fotos selecionadas.`
+          : next.length === 1
+            ? "1 foto selecionada."
+            : "Escolha pelo menos 1 foto.",
+      );
+
+      return next;
+    });
   };
 
   const generate = async () => {
@@ -83,7 +126,7 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
 
     setState("uploading");
     setProgress(8);
-    setMessage("Analisando suas fotos…");
+    setMessage(`Enviando ${files.length} ${files.length === 1 ? "foto" : "fotos"}…`);
 
     try {
       const body = new FormData();
@@ -185,33 +228,45 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
         </p>
       </div>
 
+      <input
+        ref={inputRef}
+        hidden
+        type="file"
+        accept="image/*"
+        multiple
+        onChange={(event) => chooseFiles(event.target.files)}
+      />
+
       <button
         className="mini-upload-zone"
         type="button"
         onClick={() => inputRef.current?.click()}
-        disabled={state === "uploading" || state === "processing"}
+        disabled={state === "uploading" || state === "processing" || files.length >= MAX_FILES}
       >
-        <input
-          ref={inputRef}
-          hidden
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          multiple
-          onChange={(event) => chooseFiles(event.target.files)}
-        />
         <span className="mini-upload-icon">＋</span>
         <strong>
           {files.length
-            ? `${files.length} foto${files.length > 1 ? "s" : ""} pronta${files.length > 1 ? "s" : ""}`
+            ? `Adicionar mais fotos (${files.length}/${MAX_FILES})`
             : "Adicionar foto(s)"}
         </strong>
-        <small>JPG, PNG, WebP • até 5 fotos • 25 MB por foto</small>
+        <small>JPG, PNG, WebP e outros formatos de imagem • até 5 fotos • 25 MB por foto</small>
       </button>
 
       {previewUrls.length > 0 && (
-        <div className="mini-photo-strip">
+        <div className="mini-photo-strip" aria-label="Fotos selecionadas">
           {previewUrls.map((url, index) => (
-            <img key={url} src={url} alt={`Prévia da foto ${index + 1}`} />
+            <div className="mini-photo-item" key={url}>
+              <img src={url} alt={`Prévia da foto ${index + 1}`} />
+              <button
+                type="button"
+                className="mini-photo-remove"
+                aria-label={`Remover foto ${index + 1}`}
+                onClick={() => removeFile(index)}
+                disabled={state === "uploading" || state === "processing"}
+              >
+                ×
+              </button>
+            </div>
           ))}
         </div>
       )}
@@ -236,7 +291,7 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
         onClick={generate}
       >
         {state === "uploading"
-          ? "Analisando fotos…"
+          ? "Enviando fotos…"
           : state === "processing"
             ? "Criando seu Mini…"
             : state === "done"

@@ -1,0 +1,2 @@
+[functions.mini-persona]
+verify_jwt = false

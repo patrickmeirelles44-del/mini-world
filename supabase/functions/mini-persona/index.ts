@@ -4,6 +4,8 @@ const RODIN_BASE = 'https://api.hyper3d.com/api/v2'
 const MAX_FILES = 5
 const MAX_FILE_SIZE = 25 * 1024 * 1024
 const RODIN_TIMEOUT_MS = 45_000
+const MINI_3D_PROVIDER = (Deno.env.get('MINI_3D_PROVIDER') ?? 'hyper3d').trim().toLowerCase()
+const TRELLIS_ENDPOINT = (Deno.env.get('TRELLIS_ENDPOINT') ?? '').trim()
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -60,6 +62,100 @@ async function rodinFetch(path: string, init: RequestInit = {}, timeoutMs = RODI
   }
 }
 
+async function generateWithHyper3D(images: File[]) {
+  const form = new FormData()
+
+  for (let i = 0; i < images.length; i++) {
+    const file = images[i]
+
+    if (!file.type.startsWith('image/')) {
+      throw new Error('Todos os arquivos precisam ser imagens.')
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error('Cada imagem deve ter no máximo 25 MB.')
+    }
+
+    form.append('images', file, file.name || `mini-${i}.jpg`)
+    form.append('image_label', ['F', 'B', 'L', 'R', '?'][i] ?? '?')
+  }
+
+  form.set('tier', 'Gen-2.5-High')
+  form.set('mesh_mode', 'Raw')
+  form.set('geometry_file_format', 'glb')
+  form.set('texture_mode', 'high')
+  form.set('detail_level', '3')
+  form.set('geometry_instruct_mode', 'faithful')
+  form.set('TAPose', 'true')
+
+  const response = await rodinFetch('/rodin', { method: 'POST', body: form })
+  const data = await response.json().catch(() => ({}))
+
+  if (!response.ok) {
+    const upstreamStatus = response.status
+    return {
+      ok: false,
+      status: 502,
+      payload: {
+        error: upstreamStatus === 401
+          ? `HYPER3D_AUTH: autenticação rejeitada pelo Hyper3D${data.message ? ` — ${data.message}` : '.'}`
+          : upstreamStatus === 403
+            ? `HYPER3D_ACCESS: acesso/subscrição rejeitado pelo Hyper3D${data.message ? ` — ${data.message}` : '.'}`
+            : data.message || data.error || 'Hyper3D não aceitou a geração.',
+        details: data,
+      },
+    }
+  }
+
+  if (data.error || !data.uuid || !data.jobs?.subscription_key) {
+    return {
+      ok: false,
+      status: 502,
+      payload: {
+        error: data.message || data.error || 'Hyper3D não retornou uma tarefa válida.',
+        details: data,
+      },
+    }
+  }
+
+  return {
+    ok: true,
+    status: 201,
+    payload: {
+      taskUuid: data.uuid,
+      subscriptionKey: data.jobs.subscription_key,
+      provider: 'hyper3d',
+      consumed: data.consumed ?? null,
+    },
+  }
+}
+
+async function generateWithTrellis(images: File[]) {
+  if (!TRELLIS_ENDPOINT) {
+    return {
+      ok: false,
+      status: 503,
+      payload: {
+        error: 'TRELLIS_NOT_CONFIGURED: defina TRELLIS_ENDPOINT no Supabase para ativar o provider gratuito.',
+        provider: 'trellis',
+      },
+    }
+  }
+
+  // The official TRELLIS.2 Space is a Gradio queue, not a simple REST image-to-GLB API.
+  // A dedicated adapter/worker must expose a stable job API before Edge Functions can use it safely.
+  // Keeping this explicit prevents the app from silently sending photos to an incompatible endpoint.
+  return {
+    ok: false,
+    status: 503,
+    payload: {
+      error: 'TRELLIS_ADAPTER_REQUIRED: o endpoint configurado precisa implementar o contrato de job do Mini (generate/status/download).',
+      provider: 'trellis',
+      endpoint: TRELLIS_ENDPOINT,
+    },
+  }
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders })
@@ -78,67 +174,11 @@ Deno.serve(async (req) => {
         return json({ error: 'Envie de 1 a 5 imagens.' }, 400)
       }
 
-      const form = new FormData()
+      const result = MINI_3D_PROVIDER === 'trellis'
+        ? await generateWithTrellis(images)
+        : await generateWithHyper3D(images)
 
-      for (let i = 0; i < images.length; i++) {
-        const file = images[i]
-
-        if (!file.type.startsWith('image/')) {
-          return json({ error: 'Todos os arquivos precisam ser imagens.' }, 400)
-        }
-
-        if (file.size > MAX_FILE_SIZE) {
-          return json({ error: 'Cada imagem deve ter no máximo 25 MB.' }, 400)
-        }
-
-        form.append('images', file, file.name || `mini-${i}.jpg`)
-        form.append('image_label', ['F', 'B', 'L', 'R', '?'][i] ?? '?')
-      }
-
-      form.set('tier', 'Gen-2.5-High')
-      form.set('mesh_mode', 'Raw')
-      form.set('geometry_file_format', 'glb')
-      form.set('texture_mode', 'high')
-      form.set('detail_level', '3')
-      form.set('geometry_instruct_mode', 'faithful')
-      form.set('TAPose', 'true')
-
-      const response = await rodinFetch('/rodin', { method: 'POST', body: form })
-      const data = await response.json().catch(() => ({}))
-
-      if (!response.ok) {
-        const upstreamStatus = response.status
-        return json(
-          {
-            error: upstreamStatus === 401
-              ? `HYPER3D_AUTH: autenticação rejeitada pelo Hyper3D${data.message ? ` — ${data.message}` : '.'}`
-              : upstreamStatus === 403
-                ? `HYPER3D_ACCESS: acesso/subscrição rejeitado pelo Hyper3D${data.message ? ` — ${data.message}` : '.'}`
-                : data.message || data.error || 'Hyper3D não aceitou a geração.',
-            details: data,
-          },
-          502,
-        )
-      }
-
-      if (data.error || !data.uuid || !data.jobs?.subscription_key) {
-        return json(
-          {
-            error: data.message || data.error || 'Hyper3D não retornou uma tarefa válida.',
-            details: data,
-          },
-          502,
-        )
-      }
-
-      return json(
-        {
-          taskUuid: data.uuid,
-          subscriptionKey: data.jobs.subscription_key,
-          consumed: data.consumed ?? null,
-        },
-        201,
-      )
+      return json(result.payload, result.status)
     }
 
     if (action === 'status') {

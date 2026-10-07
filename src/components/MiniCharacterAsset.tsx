@@ -26,7 +26,7 @@ const ALIASES: Record<MiniAnimation, string[]> = {
 
 function findAction(actions: Record<string, THREE.AnimationAction | null>, name: MiniAnimation) {
   for (const alias of ALIASES[name]) if (actions[alias]) return actions[alias];
-  return actions.idle ?? actions.Idle ?? null;
+  return actions["idle"] ?? actions["Idle"] ?? null;
 }
 
 function recolor(root: THREE.Object3D, tokens: string[], color?: string) {
@@ -68,7 +68,7 @@ export function MiniCharacterAsset({
     const action = findAction(actions, animation);
     if (!action) return;
     action.reset().fadeIn(0.2).play();
-    return () => action.fadeOut(0.2);
+    return () => { action.fadeOut(0.2); };
   }, [actions, animation]);
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export function MiniCharacterAsset({
   }, [scene, customization]);
 
   return (
-    <group ref={group} position={[0, -1, 0]} scale={1.45} onClick={onTap}>
+    <group ref={group} position={[0, -1, 0]} scale={1.45} onClick={() => onTap?.()}>
       <primitive object={scene} />
     </group>
   );

@@ -6,7 +6,7 @@ export const Route = createFileRoute("/api/mini/download")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = process.env.RODIN_API_KEY;
+        const apiKey = process.env["RODIN_API_KEY"];
         if (!apiKey) {
           return Response.json({ error: "RODIN_API_KEY is not configured on the server." }, { status: 503 });
         }

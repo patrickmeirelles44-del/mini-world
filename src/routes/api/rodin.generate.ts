@@ -11,7 +11,7 @@ export const Route = createFileRoute("/api/rodin/generate")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const token = process.env.REPLICATE_API_TOKEN;
+        const token = process.env["REPLICATE_API_TOKEN"];
         if (!token) {
           return Response.json(
             { error: "REPLICATE_API_TOKEN não configurado no servidor." },

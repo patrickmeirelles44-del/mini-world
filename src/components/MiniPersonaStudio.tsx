@@ -7,7 +7,7 @@ type Props = {
 };
 
 const MAX_FILES = 5;
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_30LoEtoO3rXU3V2uIb-Fyg_FQ_AmWLe";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_YdbAQ0h6x7tTqocPTEb1pA_TjhqPJeK";
 const MINI_PERSONA_URL = "https://ujohhylcrkyoqhkpnhyt.supabase.co/functions/v1/mini-persona";
 
 export function MiniPersonaStudio({ onModelReady }: Props) {

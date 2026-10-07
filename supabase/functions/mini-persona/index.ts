@@ -35,7 +35,7 @@ function actionFrom(req: Request) {
 async function rodinFetch(path: string, init: RequestInit = {}, timeoutMs = RODIN_TIMEOUT_MS) {
   const key = (Deno.env.get('RODIN_API_KEY') ?? '')
     .trim()
-    .replace(/^Bearer\\s+/i, '')
+    .replace(/^Bearer\s+/i, '').replace(/^['"]|['"]$/g, '')
   if (!key) throw new Error('RODIN_API_KEY não configurada no Supabase.')
 
   const headers = new Headers(init.headers)
@@ -111,9 +111,9 @@ Deno.serve(async (req) => {
         return json(
           {
             error: upstreamStatus === 401
-              ? 'HYPER3D_AUTH: a chave RODIN_API_KEY foi rejeitada pelo Hyper3D.'
+              ? `HYPER3D_AUTH: autenticação rejeitada pelo Hyper3D${data.message ? ` — ${data.message}` : '.'}`
               : upstreamStatus === 403
-                ? 'HYPER3D_ACCESS: a chave não tem acesso/subscrição necessária no Hyper3D.'
+                ? `HYPER3D_ACCESS: acesso/subscrição rejeitado pelo Hyper3D${data.message ? ` — ${data.message}` : '.'}`
                 : data.message || data.error || 'Hyper3D não aceitou a geração.',
             details: data,
           },

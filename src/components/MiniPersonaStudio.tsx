@@ -7,6 +7,7 @@ type Props = {
 };
 
 const MAX_FILES = 5;
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"] ?? "";
 const MINI_PERSONA_URL = "https://ujohhylcrkyoqhkpnhyt.supabase.co/functions/v1/mini-persona";
 
 export function MiniPersonaStudio({ onModelReady }: Props) {
@@ -43,7 +44,7 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
       const body = new FormData();
       files.forEach((file) => body.append("images", file, file.name));
 
-      const createResponse = await fetch(MINI_PERSONA_URL, { method: "POST", headers: { "x-mini-action": "generate" }, body });
+      const createResponse = await fetch(MINI_PERSONA_URL, { method: "POST", headers: { apikey: SUPABASE_PUBLISHABLE_KEY, "x-mini-action": "generate" }, body });
       const created = await createResponse.json();
       if (!createResponse.ok) throw new Error(created.error || "Não foi possível iniciar a geração.");
 
@@ -59,7 +60,7 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
 
         const statusResponse = await fetch(MINI_PERSONA_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "x-mini-action": "status" },
+          headers: { "Content-Type": "application/json", apikey: SUPABASE_PUBLISHABLE_KEY, "x-mini-action": "status" },
           body: JSON.stringify({ subscriptionKey: created.subscriptionKey }),
         });
         const status = await statusResponse.json();
@@ -75,7 +76,7 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
 
           const downloadResponse = await fetch(MINI_PERSONA_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json", "x-mini-action": "download" },
+            headers: { "Content-Type": "application/json", apikey: SUPABASE_PUBLISHABLE_KEY, "x-mini-action": "download" },
             body: JSON.stringify({ taskUuid: created.taskUuid }),
           });
           const downloaded = await downloadResponse.json();

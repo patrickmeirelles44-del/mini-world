@@ -11,12 +11,11 @@ const MAX_FILE_SIZE = 25 * 1024 * 1024;
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_YdbAQ0h6x7tTqocPTEb1pA_TjhqPJeK";
 const MINI_PERSONA_URL = "https://ujohhylcrkyoqhkpnhyt.supabase.co/functions/v1/mini-persona";
 
-// Some WebViews/proxies can drop custom headers. Supabase accepts the
-// publishable key in apikey and, for compatibility, in Authorization.
+// Supabase publishable keys belong in the apikey header.
+// They are not JWTs and must not be sent as Authorization: Bearer.
 function supabaseHeaders(contentType?: string): Record<string, string> {
   return {
     apikey: SUPABASE_PUBLISHABLE_KEY,
-    Authorization: `Bearer ${SUPABASE_PUBLISHABLE_KEY}`,
     ...(contentType ? { "Content-Type": contentType } : {}),
   };
 }
@@ -143,10 +142,7 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
 
           const downloadResponse = await fetch(`${MINI_PERSONA_URL}?action=download`, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              apikey: SUPABASE_PUBLISHABLE_KEY,
-            },
+            headers: supabaseHeaders("application/json"),
             body: JSON.stringify({
               taskUuid: created.taskUuid,
             }),

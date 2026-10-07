@@ -8,7 +8,6 @@ type Props = {
 
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
-const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_YdbAQ0h6x7tTqocPTEb1pA_TjhqPJeK";
 const MINI_PERSONA_URL = "https://ujohhylcrkyoqhkpnhyt.supabase.co/functions/v1/mini-persona";
 
 function errorMessage(payload: unknown, fallback: string) {
@@ -82,10 +81,6 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
 
       const createResponse = await fetch(`${MINI_PERSONA_URL}?action=generate`, {
         method: "POST",
-        headers: {
-          apikey: SUPABASE_PUBLISHABLE_KEY,
-          "x-mini-action": "generate",
-        },
         body,
       });
 
@@ -112,8 +107,6 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            apikey: SUPABASE_PUBLISHABLE_KEY,
-            "x-mini-action": "status",
           },
           body: JSON.stringify({
             subscriptionKey: created.subscriptionKey,
@@ -142,8 +135,6 @@ export function MiniPersonaStudio({ onModelReady }: Props) {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              apikey: SUPABASE_PUBLISHABLE_KEY,
-              "x-mini-action": "download",
             },
             body: JSON.stringify({
               taskUuid: created.taskUuid,

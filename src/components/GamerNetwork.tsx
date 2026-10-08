@@ -16,7 +16,7 @@ const fallbackGames: Game[] = [
 const badges = [{icon:"♛",name:"Lenda",rarity:"LENDÁRIA"},{icon:"⚔",name:"Competidor",rarity:"ÉPICA"},{icon:"✦",name:"Colecionador",rarity:"RARA"},{icon:"◈",name:"Primeiro Spawn",rarity:"COMUM"}];
 
 function useCurrentProfile() {
- const [profile,setProfile]=useState<Profile|null>(null);
+ const [profile,setProfile]=useState<Profile|null>(supabase ? null : {id:"demo-profile",username:"forge_player",display_name:"Gamer",bio:"Construindo meu universo gamer no FORGE.",avatar_url:null,city:"Brasil",state:null,country:"Brasil",level:1,xp:0,status:"online"});
  useEffect(()=>{ let active=true; (async()=>{if(!supabase)return; const {data:{user}}=await supabase.auth.getUser(); if(!user)return; const {data}=await supabase.from("profiles").select("*").eq("id",user.id).single(); if(active)setProfile(data);})(); return()=>{active=false}},[]);
  return {profile,setProfile};
 }

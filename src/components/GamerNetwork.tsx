@@ -22,14 +22,27 @@ function useCurrentProfile() {
 }
 
 function TempleProfile({profile,games}:{profile:Profile;games:Game[]}) {
- return <section className="temple-card"><div className="temple-bg"><div className="orb orb-a"/><div className="orb orb-b"/><div className="grid-floor"/></div><div className="temple-content">
-  <div className="temple-top"><span>GAMER TEMPLE</span><button><Sparkles size={15}/> Personalizar</button></div>
-  <div className="temple-hero"><div className="avatar-frame"><div className="avatar">{profile.avatar_url?<img src={profile.avatar_url} alt="Avatar"/>:profile.display_name?.[0]?.toUpperCase()||"G"}</div><span className={"online "+(profile.status!=="online"?"offline":"")}/></div><div><p className="eyebrow">NÍVEL {profile.level} · GAMER</p><h1>{profile.display_name}</h1><p className="muted"><MapPin size={13}/>{[profile.city,profile.state,profile.country].filter(Boolean).join(" · ")||"Brasil"}</p></div></div>
-  <div className="stats"><div><strong>{games.length}</strong><span>JOGOS</span></div><div><strong>—</strong><span>INSÍGNIAS</span></div><div><strong>{profile.xp}</strong><span>XP</span></div><div><strong>—</strong><span>AMIGOS</span></div></div>
-  <div className="game-row">{games.map(g=><div className="game-pill" key={g.id}><i style={{background:g.accent}}>{g.name[0]}</i><span>{g.name}</span></div>)}</div>
- </div></section>
+ const [theme,setTheme]=useState(()=>localStorage.getItem("forge-theme")||"nexus");
+ const [customizing,setCustomizing]=useState(false);
+ const themes={nexus:"temple-nexus",inferno:"temple-inferno",cyber:"temple-cyber",void:"temple-void"} as const;
+ const xpNext=Math.max(100,profile.level*100);
+ const xpPct=Math.min(100,Math.round((profile.xp/xpNext)*100));
+ const choose=(t:keyof typeof themes)=>{setTheme(t);localStorage.setItem("forge-theme",t)};
+ return <section className={"temple-card "+themes[theme as keyof typeof themes]}>
+  <div className="temple-bg"><div className="temple-noise"/><div className="orb orb-a"/><div className="orb orb-b"/><div className="orb orb-c"/><div className="temple-stars">{Array.from({length:22},(_,i)=><i key={i}/>)}</div><div className="grid-floor"/></div>
+  <div className="temple-content">
+   <div className="temple-top"><span>GAMER TEMPLE <b>/// {theme}</b></span><button onClick={()=>setCustomizing(v=>!v)}><Sparkles size={15}/> Personalizar</button></div>
+   <div className="temple-hero">
+    <div className="avatar-frame"><div className="avatar">{profile.avatar_url?<img src={profile.avatar_url} alt="Avatar"/>:profile.display_name?.[0]?.toUpperCase()||"G"}</div><span className={"online "+(profile.status!=="online"?"offline":"")}/></div>
+    <div className="identity"><p className="eyebrow">NÍVEL {profile.level} · GAMER</p><h1>{profile.display_name}</h1><p className="muted"><MapPin size={13}/>{[profile.city,profile.state,profile.country].filter(Boolean).join(" · ")||"Brasil"}</p><div className="xp-wrap"><div><span>PROGRESSÃO</span><b>{profile.xp} / {xpNext} XP</b></div><div className="xp-track"><i style={{width:xpPct+"%"}}/></div></div></div>
+   </div>
+   <div className="temple-slogan"><span>IDENTIDADE</span><strong>Seu jogo. Seu mundo. Sua assinatura.</strong></div>
+   <div className="stats"><div><strong>{games.length}</strong><span>JOGOS</span></div><div><strong>4</strong><span>INSÍGNIAS</span></div><div><strong>{profile.xp}</strong><span>XP</span></div><div><strong>0</strong><span>AMIGOS</span></div></div>
+   <div className="game-row">{games.map(g=><div className="game-pill" key={g.id}><i style={{background:g.accent}}>{g.name[0]}</i><span>{g.name}</span></div>)}</div>
+   {customizing&&<div className="temple-customizer"><div><span>ATMOSFERA DO TEMPLO</span><small>Escolha a identidade visual do seu perfil.</small></div><div className="theme-options">{(Object.keys(themes) as Array<keyof typeof themes>).map(t=><button key={t} className={theme===t?"active":""} onClick={()=>choose(t)}><i className={"theme-dot "+t}/>{t.toUpperCase()}</button>)}</div></div>}
+  </div>
+ </section>
 }
-
 function Composer({profile,onCreated}:{profile:Profile;onCreated:(p:Post)=>void}) {
  const [body,setBody]=useState(""); const [busy,setBusy]=useState(false); const [file,setFile]=useState<File|null>(null);
  async function publish(){if(!supabase||(!body.trim()&&!file))return;setBusy(true);let image_url:null|string=null;if(file){const ext=file.name.split(".").pop()||"jpg";const path=profile.id+"/"+crypto.randomUUID()+"."+ext;const up=await supabase.storage.from("avatars").upload(path,file,{upsert:false,contentType:file.type});if(!up.error){const {data}=supabase.storage.from("avatars").getPublicUrl(path);image_url=data.publicUrl}}const {data,error}=await supabase.from("posts").insert({profile_id:profile.id,body:body.trim(),image_url}).select("*").single();setBusy(false);if(!error&&data){onCreated({...data,profile});setBody("");setFile(null)}}

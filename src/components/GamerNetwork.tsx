@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, OrbitControls, Sparkles as ThreeSparkles } from "@react-three/drei";
+import { Float, Sparkles as ThreeSparkles } from "@react-three/drei";
 import * as THREE from "three";
 import { Gamepad2, Home, Users, MessageCircle, Search, Bell, Plus, MapPin, Trophy, Shield, Sparkles, ChevronRight, Heart, Send, LogOut, Settings } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -34,7 +34,7 @@ function Torch({position,accent}:{position:[number,number,number];accent:string}
 
 function GamerAvatar3D({accent}:{accent:string}){return <group position={[0,.48,0]}><Float speed={1.5} rotationIntensity={.03} floatIntensity={.12}><mesh position={[0,1.45,0]}><capsuleGeometry args={[.34,.7,8,20]}/><meshStandardMaterial color="#14131a" roughness={.42} metalness={.25}/></mesh><mesh position={[0,2.05,0]}><sphereGeometry args={[.31,24,18]}/><meshStandardMaterial color="#b77d5d" roughness={.7}/></mesh><mesh position={[0,2.18,.08]} scale={[1.05,.55,.9]}><sphereGeometry args={[.3,24,18]}/><meshStandardMaterial color="#17151c" roughness={.7}/></mesh><mesh position={[-.43,1.55,0]} rotation={[0,0,-.16]}><capsuleGeometry args={[.09,.52,6,12]}/><meshStandardMaterial color="#181620" metalness={.25}/></mesh><mesh position={[.43,1.55,0]} rotation={[0,0,.16]}><capsuleGeometry args={[.09,.52,6,12]}/><meshStandardMaterial color="#181620" metalness={.25}/></mesh><mesh position={[-.18,.72,0]}><capsuleGeometry args={[.11,.68,6,12]}/><meshStandardMaterial color="#101016" roughness={.5}/></mesh><mesh position={[.18,.72,0]}><capsuleGeometry args={[.11,.68,6,12]}/><meshStandardMaterial color="#101016" roughness={.5}/></mesh><mesh position={[-.18,.3,.08]} scale={[1.15,.5,1.7]}><boxGeometry args={[.22,.22,.42]}/><meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1.2} metalness={.4}/></mesh><mesh position={[.18,.3,.08]} scale={[1.15,.5,1.7]}><boxGeometry args={[.22,.22,.42]}/><meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1.2} metalness={.4}/></mesh></Float></group>}
 
-function TempleScene({accent}:{accent:string}){const ref=useRef<THREE.Group>(null);useFrame((state)=>{if(ref.current){ref.current.rotation.y=THREE.MathUtils.lerp(ref.current.rotation.y,state.pointer.x*.08,.045);ref.current.rotation.x=THREE.MathUtils.lerp(ref.current.rotation.x,state.pointer.y*-.025,.045)}});return <group ref={ref}>
+function TempleScene({accent}:{accent:string}){const ref=useRef<THREE.Group>(null);useFrame((state,delta)=>{if(ref.current){ref.current.rotation.y += delta*0.08; ref.current.rotation.x = THREE.MathUtils.lerp(ref.current.rotation.x, -0.025, 0.04);}});return <group ref={ref}>
  <mesh position={[0,.08,0]}><cylinderGeometry args={[2.35,2.65,.22,64]}/><meshStandardMaterial color="#0d0c12" metalness={.85} roughness={.26}/></mesh>
  <mesh position={[0,.2,0]}><torusGeometry args={[1.9,.055,16,96]}/><meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={4}/></mesh>
  <mesh position={[0,.3,0]}><cylinderGeometry args={[1.72,1.9,.12,64]}/><meshStandardMaterial color="#1a1622" metalness={.75} roughness={.32}/></mesh>
@@ -47,10 +47,12 @@ function TempleScene({accent}:{accent:string}){const ref=useRef<THREE.Group>(nul
  <ThreeSparkles count={130} scale={[5,3.8,4]} size={1.6} speed={.3} color={accent}/>
  </group>}
 
-function Temple3D({accent}:{accent:string}){return <div className="temple-3d"><Canvas camera={{position:[0,1.65,6.4],fov:36}} dpr={[1,1.5]}><color attach="background" args={["#08070c"]}/><fog attach="fog" args={["#08070c",4,9]}/><ambientLight intensity={.28}/><hemisphereLight intensity={.35} groundColor="#050409" color="#b9a0ff"/><pointLight position={[0,2.6,2.5]} color={accent} intensity={24} distance={8}/><pointLight position={[-3,2,2]} color="#ff7b18" intensity={8} distance={5}/><pointLight position={[3,2,2]} color="#7c3aed" intensity={10} distance={5}/><TempleScene accent={accent}/><OrbitControls enableZoom={false} enablePan={false} enableDamping dampingFactor={.08} minPolarAngle={1.25} maxPolarAngle={1.75}/></Canvas></div>}
+function Temple3D({accent}:{accent:string}){return <div className="temple-3d" aria-label="Gamer Temple 3D"><Canvas frameloop="always" camera={{position:[0,1.65,6.4],fov:36}} dpr={[1,1.5]} gl={{antialias:true,alpha:true,powerPreference:"high-performance"}} fallback={<div className="temple-3d-fallback">3D indisponível neste dispositivo</div>}><color attach="background" args={["#08070c"]}/><fog attach="fog" args={["#08070c",4,9]}/><ambientLight intensity={.28}/><hemisphereLight intensity={.35} groundColor="#050409" color="#b9a0ff"/><pointLight position={[0,2.6,2.5]} color={accent} intensity={24} distance={8}/><pointLight position={[-3,2,2]} color="#ff7b18" intensity={8} distance={5}/><pointLight position={[3,2,2]} color="#7c3aed" intensity={10} distance={5}/><TempleScene accent={accent}/></Canvas></div>}
 
 function TempleProfile({profile,games}:{profile:Profile;games:Game[]}) {
- const [theme,setTheme]=useState(()=>localStorage.getItem("forge-theme")||"nexus");
+ const themes={nexus:"temple-nexus",inferno:"temple-inferno",cyber:"temple-cyber",void:"temple-void"} as const;
+ const [theme,setTheme]=useState<keyof typeof themes>("nexus");
+ useEffect(()=>{const saved=window.localStorage.getItem("forge-theme") as keyof typeof themes | null;if(saved&&saved in themes) setTheme(saved)},[]);
  const pointerX=useSpring(useMotionValue(0),{stiffness:180,damping:24});
  const pointerY=useSpring(useMotionValue(0),{stiffness:180,damping:24});
  const tiltX=useTransform(pointerY,[-1,1],[4,-4]);
@@ -62,11 +64,10 @@ function TempleProfile({profile,games}:{profile:Profile;games:Game[]}) {
  const handlePointerMove=(e:React.PointerEvent)=>{const r=e.currentTarget.getBoundingClientRect();pointerX.set((e.clientX-r.left)/r.width*2-1);pointerY.set((e.clientY-r.top)/r.height*2-1)};
  const resetPointer=()=>{pointerX.set(0);pointerY.set(0)};
  const [customizing,setCustomizing]=useState(false);
- const themes={nexus:"temple-nexus",inferno:"temple-inferno",cyber:"temple-cyber",void:"temple-void"} as const;
  const xpNext=Math.max(100,profile.level*100);
  const xpPct=Math.min(100,Math.round((profile.xp/xpNext)*100));
- const choose=(t:keyof typeof themes)=>{setTheme(t);localStorage.setItem("forge-theme",t)};
- return <motion.section className={"temple-card "+themes[theme as keyof typeof themes]} onPointerMove={handlePointerMove} onPointerLeave={resetPointer} style={{perspective:1200,rotateX:tiltX,rotateY:tiltY}}>
+ const choose=(t:keyof typeof themes)=>{setTheme(t);window.localStorage.setItem("forge-theme",t)};
+ return <motion.section className={"temple-card "+themes[theme]} onPointerMove={handlePointerMove} onPointerLeave={resetPointer} style={{perspective:1200,rotateX:tiltX,rotateY:tiltY}}>
   <motion.div className="temple-bg" style={{x:bgX,y:bgY,scale:1.04}}><div className="temple-noise"/><div className="orb orb-a"/><div className="orb orb-b"/><div className="orb orb-c"/><div className="temple-stars">{Array.from({length:22},(_,i)=><i key={i}/>)}</div><div className="grid-floor"/></div>
   <Temple3D accent={theme==="inferno"?"#ff4d4d":theme==="cyber"?"#00e5ff":theme==="void"?"#a78bfa":"#a855f7"}/>
   <div className="temple-content">

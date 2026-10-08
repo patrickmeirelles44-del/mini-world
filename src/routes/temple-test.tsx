@@ -55,7 +55,7 @@ function TempleTest() {
   useEffect(() => { setMounted(true); }, []);
   return (
     <main style={{ minHeight: "100vh", background: "#05030d", color: "#fff", fontFamily: "Inter, system-ui, sans-serif", overflow: "hidden" }}>
-      <header style={{ position: "absolute", zIndex: 5, top: 24, left: 24, right: 24, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <header style={{ position: "absolute", zIndex: 5, top: 24, left: 24, right: 24, display: "flex", justifyContent: "space-between", alignItems: "center" }} className="temple-test-header">
         <div>
           <div style={{ fontSize: 12, letterSpacing: "0.28em", opacity: 0.55 }}>FORGE / LAB</div>
           <h1 style={{ margin: "6px 0 0", fontSize: 26 }}>Temple 3D Test</h1>
@@ -79,7 +79,7 @@ function TempleTest() {
           </div>
         )}
 
-        <div style={{ position: "absolute", left: "50%", bottom: 46, transform: "translateX(-50%)", width: "min(760px, calc(100% - 32px))", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+        <div className="temple-test-cards" style={{ position: "absolute", left: "50%", bottom: 46, transform: "translateX(-50%)", width: "min(760px, calc(100% - 32px))", display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 12 }}>
           {["3D Core", "Lighting", "Particles"].map((label, i) => (
             <motion.div
               key={label}

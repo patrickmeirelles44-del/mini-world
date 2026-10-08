@@ -68,7 +68,7 @@ function TempleProfile({profile,games}:{profile:Profile;games:Game[]}) {
  const xpPct=Math.min(100,Math.round((profile.xp/xpNext)*100));
  const choose=(t:keyof typeof themes)=>{setTheme(t);window.localStorage.setItem("forge-theme",t)};
  return <motion.section className={"temple-card "+themes[theme]} onPointerMove={handlePointerMove} onPointerLeave={resetPointer} style={{perspective:1200,rotateX:tiltX,rotateY:tiltY}}>
-  <motion.div className="temple-bg" style={{x:bgX,y:bgY,scale:1.04}}><div className="temple-noise"/><div className="orb orb-a"/><div className="orb orb-b"/><div className="orb orb-c"/><div className="temple-stars">{Array.from({length:22},(_,i)=><i key={i}/>)}</div><div className="grid-floor"/></div>
+  <motion.div className="temple-bg" style={{x:bgX,y:bgY,scale:1.04}}><div className="temple-noise"/><div className="orb orb-a"/><div className="orb orb-b"/><div className="orb orb-c"/><div className="temple-stars">{Array.from({length:22},(_,i)=><i key={i}/>)}</div><div className="grid-floor"/></motion.div>
   <Temple3D accent={theme==="inferno"?"#ff4d4d":theme==="cyber"?"#00e5ff":theme==="void"?"#a78bfa":"#a855f7"}/>
   <div className="temple-content">
    <div className="temple-top"><span>GAMER TEMPLE <b>/// {theme}</b></span><button onClick={()=>setCustomizing(v=>!v)}><Sparkles size={15}/> Personalizar</button></div>

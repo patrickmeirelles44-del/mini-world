@@ -82,6 +82,7 @@ function TempleProfile({profile,games}:{profile:Profile;games:Game[]}) {
    <div className="temple-evolution"><div><span>EVOLUÇÃO DO TEMPLO</span><b>{Math.min(100, profile.level*12 + Math.floor(profile.xp/10))}%</b></div><div className="evolution-track"><i style={{width:Math.min(100, profile.level*12 + Math.floor(profile.xp/10))+"%"}}/></div><div className="evolution-nodes"><span>SPAWN</span><span>AWAKENED</span><span>LEGEND</span></div></div>
    <div className="game-row">{games.map(g=><div className="game-pill" key={g.id}><i style={{background:g.accent}}>{g.name[0]}</i><span>{g.name}</span></div>)}</div>
    {customizing&&<div className="temple-customizer"><div><span>ATMOSFERA DO TEMPLO</span><small>Escolha a identidade visual do seu perfil.</small></div><div className="theme-options">{(Object.keys(themes) as Array<keyof typeof themes>).map(t=><button key={t} className={theme===t?"active":""} onClick={()=>choose(t)}><i className={"theme-dot "+t}/>{t.toUpperCase()}</button>)}</div></div>}
+   </div>
   </motion.div>
  </motion.section>
 }

@@ -1,7 +1,7 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Sparkles } from "@react-three/drei";
 import { motion } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -50,9 +50,13 @@ function Scene() {
   );
 }
 
+function WebGLFallback(){return <div style={{position:"absolute",inset:0,display:"grid",placeContent:"center",justifyItems:"center",gap:12,textAlign:"center",padding:24,color:"#fda4af",background:"#090611"}}><div style={{fontSize:56}}>◇</div><strong>Este navegador não disponibilizou WebGL</strong><span style={{maxWidth:340,fontSize:13,lineHeight:1.6}}>Teste no Safari atualizado ou em um computador. Se estiver usando modo de economia de energia, tente desativá-lo e recarregar.</span></div>}
+function hasWebGL(){try{const c=document.createElement("canvas");return !!(window.WebGLRenderingContext&&(c.getContext("webgl2")||c.getContext("webgl")))}catch{return false}}
+class SceneErrorBoundary extends React.Component<{children:React.ReactNode},{failed:boolean}>{state={failed:false};static getDerivedStateFromError(){return {failed:true}}componentDidCatch(error:Error){console.error("FORGE Temple 3D test failed:",error)}render(){return this.state.failed?<WebGLFallback/>:this.props.children}}
 function TempleTest() {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const [webgl, setWebgl] = useState(false);
+  useEffect(() => { setWebgl(hasWebGL()); setMounted(true); }, []);
   return (
     <main style={{ minHeight: "100vh", background: "#05030d", color: "#fff", fontFamily: "Inter, system-ui, sans-serif", overflow: "hidden" }}>
       <header style={{ position: "absolute", zIndex: 5, top: 24, left: 24, right: 24, display: "flex", justifyContent: "space-between", alignItems: "center" }} className="temple-test-header">
@@ -64,19 +68,18 @@ function TempleTest() {
       </header>
 
       <section style={{ position: "relative", height: "100svh", minHeight: "min(680px, 100svh)" }}>
-        {mounted ? (
-          <Canvas
-            dpr={typeof window !== "undefined" && window.matchMedia("(max-width: 700px)").matches ? [1, 1.25] : [1, 2]}
-            camera={{ position: [0, 0.3, 5.8], fov: 42 }}
-            gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
-            fallback={<div style={{ paddingTop: 180, textAlign: "center", color: "#fda4af" }}>WebGL não disponível neste dispositivo.</div>}
-          >
-            <Scene />
-          </Canvas>
-        ) : (
-          <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", color: "#c4b5fd" }}>
-            Preparando o laboratório 3D…
-          </div>
+        {!mounted ? (
+          <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", color: "#c4b5fd" }}>Preparando o laboratório 3D…</div>
+        ) : !webgl ? <WebGLFallback/> : (
+          <SceneErrorBoundary>
+            <Canvas
+              dpr={window.matchMedia("(max-width: 700px)").matches ? [1, 1.25] : [1, 1.5]}
+              camera={{ position: [0, 0.3, 5.8], fov: 42 }}
+              gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+            >
+              <Scene />
+            </Canvas>
+          </SceneErrorBoundary>
         )}
 
         <div className="temple-test-cards" style={{ position: "absolute", left: "50%", bottom: 46, transform: "translateX(-50%)", width: "min(760px, calc(100% - 32px))", display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 12 }}>

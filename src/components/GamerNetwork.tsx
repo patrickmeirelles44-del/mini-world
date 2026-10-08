@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import { Gamepad2, Home, Users, MessageCircle, Search, Bell, Plus, MapPin, Trophy, Shield, Sparkles, ChevronRight, Heart, Send, LogOut, Settings } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -28,13 +29,23 @@ function useCurrentProfile() {
 
 function TempleProfile({profile,games}:{profile:Profile;games:Game[]}) {
  const [theme,setTheme]=useState(()=>localStorage.getItem("forge-theme")||"nexus");
+ const pointerX=useSpring(useMotionValue(0),{stiffness:180,damping:24});
+ const pointerY=useSpring(useMotionValue(0),{stiffness:180,damping:24});
+ const tiltX=useTransform(pointerY,[-1,1],[4,-4]);
+ const tiltY=useTransform(pointerX,[-1,1],[-5,5]);
+ const bgX=useTransform(pointerX,[-1,1],[-18,18]);
+ const bgY=useTransform(pointerY,[-1,1],[-12,12]);
+ const contentX=useTransform(pointerX,[-1,1],[-5,5]);
+ const contentY=useTransform(pointerY,[-1,1],[-3,3]);
+ const handlePointerMove=(e:React.PointerEvent)=>{const r=e.currentTarget.getBoundingClientRect();pointerX.set((e.clientX-r.left)/r.width*2-1);pointerY.set((e.clientY-r.top)/r.height*2-1)};
+ const resetPointer=()=>{pointerX.set(0);pointerY.set(0)};
  const [customizing,setCustomizing]=useState(false);
  const themes={nexus:"temple-nexus",inferno:"temple-inferno",cyber:"temple-cyber",void:"temple-void"} as const;
  const xpNext=Math.max(100,profile.level*100);
  const xpPct=Math.min(100,Math.round((profile.xp/xpNext)*100));
  const choose=(t:keyof typeof themes)=>{setTheme(t);localStorage.setItem("forge-theme",t)};
- return <section className={"temple-card "+themes[theme as keyof typeof themes]}>
-  <div className="temple-bg"><div className="temple-noise"/><div className="orb orb-a"/><div className="orb orb-b"/><div className="orb orb-c"/><div className="temple-stars">{Array.from({length:22},(_,i)=><i key={i}/>)}</div><div className="grid-floor"/></div>
+ return <motion.section className={"temple-card "+themes[theme as keyof typeof themes]} onPointerMove={handlePointerMove} onPointerLeave={resetPointer} style={{perspective:1200,rotateX:tiltX,rotateY:tiltY}}>
+  <motion.div className="temple-bg" style={{x:bgX,y:bgY,scale:1.04}}><div className="temple-noise"/><div className="orb orb-a"/><div className="orb orb-b"/><div className="orb orb-c"/><div className="temple-stars">{Array.from({length:22},(_,i)=><i key={i}/>)}</div><div className="grid-floor"/></div>
   <div className="temple-content">
    <div className="temple-top"><span>GAMER TEMPLE <b>/// {theme}</b></span><button onClick={()=>setCustomizing(v=>!v)}><Sparkles size={15}/> Personalizar</button></div>
    <div className="temple-hero">
@@ -47,8 +58,8 @@ function TempleProfile({profile,games}:{profile:Profile;games:Game[]}) {
    <div className="temple-evolution"><div><span>EVOLUÇÃO DO TEMPLO</span><b>{Math.min(100, profile.level*12 + Math.floor(profile.xp/10))}%</b></div><div className="evolution-track"><i style={{width:Math.min(100, profile.level*12 + Math.floor(profile.xp/10))+"%"}}/></div><div className="evolution-nodes"><span>SPAWN</span><span>AWAKENED</span><span>LEGEND</span></div></div>
    <div className="game-row">{games.map(g=><div className="game-pill" key={g.id}><i style={{background:g.accent}}>{g.name[0]}</i><span>{g.name}</span></div>)}</div>
    {customizing&&<div className="temple-customizer"><div><span>ATMOSFERA DO TEMPLO</span><small>Escolha a identidade visual do seu perfil.</small></div><div className="theme-options">{(Object.keys(themes) as Array<keyof typeof themes>).map(t=><button key={t} className={theme===t?"active":""} onClick={()=>choose(t)}><i className={"theme-dot "+t}/>{t.toUpperCase()}</button>)}</div></div>}
-  </div>
- </section>
+  </motion.div>
+ </motion.section>
 }
 function Composer({profile,onCreated}:{profile:Profile;onCreated:(p:Post)=>void}) {
  const [body,setBody]=useState(""); const [busy,setBusy]=useState(false); const [file,setFile]=useState<File|null>(null);

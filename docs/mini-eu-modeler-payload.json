@@ -1,0 +1,12 @@
+{
+  "asset": "mini-eu-reference-sheet",
+  "type": "3d-character-reference",
+  "goal": "Create a production-ready stylized 3D Mini based on the supplied reference sheet.",
+  "style": "premium cinematic toy-like 3D, polished, expressive, cute but faithful to adult proportions",
+  "identity": ["buzz cut", "full neatly shaped beard", "strong eyebrows", "brown eyes", "neck cross tattoo", "forearm tattoos", "chain necklace", "watch"],
+  "outfit": ["navy blue graphic t-shirt", "black/dark shorts", "white crew socks", "white high-top sneakers with subtle purple accents"],
+  "required_views": ["front", "left profile", "right profile", "back", "face close-up", "hands", "shoes"],
+  "technical": {"format": "glb", "textured": true, "rigged": true, "humanoid": true, "ready_for_web": true},
+  "app_target": "mini-world",
+  "provider": "Hyper3D via mini-persona Edge Function"
+}

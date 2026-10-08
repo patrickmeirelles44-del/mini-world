@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "motion/react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { Environment, Float, OrbitControls, Sparkles as ThreeSparkles } from "@react-three/drei";
+import * as THREE from "three";
 import { Gamepad2, Home, Users, MessageCircle, Search, Bell, Plus, MapPin, Trophy, Shield, Sparkles, ChevronRight, Heart, Send, LogOut, Settings } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -27,6 +30,9 @@ function useCurrentProfile() {
  return {profile,setProfile};
 }
 
+function TempleScene({accent}:{accent:string}) { const ref=useRef<THREE.Group>(null); useFrame((state)=>{if(ref.current){ref.current.rotation.y=THREE.MathUtils.lerp(ref.current.rotation.y,state.pointer.x*.12,.04);ref.current.rotation.x=THREE.MathUtils.lerp(ref.current.rotation.x,state.pointer.y*-.05,.04)}}); return <group ref={ref}><Float speed={1.1} rotationIntensity={.12} floatIntensity={.25}><mesh><cylinderGeometry args={[1.8,2.15,.18,64]}/><meshStandardMaterial color="#171323" metalness={.8} roughness={.3} emissive={accent} emissiveIntensity={.15}/></mesh><mesh position={[0,.12,0]}><torusGeometry args={[1.35,.035,16,64]}/><meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={3}/></mesh><mesh position={[0,.55,0]}><octahedronGeometry args={[.48,.2]}/><meshStandardMaterial color={accent} metalness={.65} roughness={.2} emissive={accent} emissiveIntensity={1.8}/></mesh>{[-1.45,1.45].map(x=><mesh key={x} position={[x,.65,-.15]}><boxGeometry args={[.22,1.35,.22]}/><meshStandardMaterial color="#292032" metalness={.7}/></mesh>)}</Float></group> }
+function Temple3D({accent}:{accent:string}){return <div className="temple-3d"><Canvas camera={{position:[0,1.2,5.2],fov:42}} dpr={[1,1.5]}><ambientLight intensity={.45}/><pointLight position={[0,2,2]} color={accent} intensity={18} distance={7}/><pointLight position={[-3,1,1]} color="#7c3aed" intensity={9} distance={6}/><Environment preset="night"/><TempleScene accent={accent}/><ThreeSparkles count={90} scale={[5,3,4]} size={1.8} speed={.25} color={accent}/><OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={.35} minPolarAngle={1.25} maxPolarAngle={1.85}/></Canvas></div>}
+
 function TempleProfile({profile,games}:{profile:Profile;games:Game[]}) {
  const [theme,setTheme]=useState(()=>localStorage.getItem("forge-theme")||"nexus");
  const pointerX=useSpring(useMotionValue(0),{stiffness:180,damping:24});
@@ -46,6 +52,7 @@ function TempleProfile({profile,games}:{profile:Profile;games:Game[]}) {
  const choose=(t:keyof typeof themes)=>{setTheme(t);localStorage.setItem("forge-theme",t)};
  return <motion.section className={"temple-card "+themes[theme as keyof typeof themes]} onPointerMove={handlePointerMove} onPointerLeave={resetPointer} style={{perspective:1200,rotateX:tiltX,rotateY:tiltY}}>
   <motion.div className="temple-bg" style={{x:bgX,y:bgY,scale:1.04}}><div className="temple-noise"/><div className="orb orb-a"/><div className="orb orb-b"/><div className="orb orb-c"/><div className="temple-stars">{Array.from({length:22},(_,i)=><i key={i}/>)}</div><div className="grid-floor"/></div>
+  <Temple3D accent={theme==="inferno"?"#ff4d4d":theme==="cyber"?"#00e5ff":theme==="void"?"#a78bfa":"#a855f7"}/>
   <div className="temple-content">
    <div className="temple-top"><span>GAMER TEMPLE <b>/// {theme}</b></span><button onClick={()=>setCustomizing(v=>!v)}><Sparkles size={15}/> Personalizar</button></div>
    <div className="temple-hero">

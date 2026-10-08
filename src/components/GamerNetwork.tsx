@@ -38,11 +38,13 @@ function TempleProfile({profile,games}:{profile:Profile;games:Game[]}) {
   <div className="temple-content">
    <div className="temple-top"><span>GAMER TEMPLE <b>/// {theme}</b></span><button onClick={()=>setCustomizing(v=>!v)}><Sparkles size={15}/> Personalizar</button></div>
    <div className="temple-hero">
+    <div className="temple-runes" aria-hidden="true"><span>✦</span><span>◈</span><span>◆</span><span>✧</span></div>
     <div className="avatar-frame"><div className="avatar">{profile.avatar_url?<img src={profile.avatar_url} alt="Avatar"/>:profile.display_name?.[0]?.toUpperCase()||"G"}</div><span className={"online "+(profile.status!=="online"?"offline":"")}/></div>
     <div className="identity"><p className="eyebrow">NÍVEL {profile.level} · {getArchetype(games).toUpperCase()}</p><h1>{profile.display_name}</h1><p className="muted"><MapPin size={13}/>{[profile.city,profile.state,profile.country].filter(Boolean).join(" · ")||"Brasil"}</p><div className="xp-wrap"><div><span>PROGRESSÃO</span><b>{profile.xp} / {xpNext} XP</b></div><div className="xp-track"><i style={{width:xpPct+"%"}}/></div></div></div>
    </div>
    <div className="temple-slogan"><span>{getArchetype(games).toUpperCase()}</span><strong>Seu jogo. Seu mundo. Sua assinatura.</strong><small>Arquétipo evolutivo</small></div>
    <div className="stats"><div><strong>{games.length}</strong><span>JOGOS</span></div><div><strong>4</strong><span>INSÍGNIAS</span></div><div><strong>{profile.xp}</strong><span>XP</span></div><div><strong>0</strong><span>AMIGOS</span></div></div>
+   <div className="temple-evolution"><div><span>EVOLUÇÃO DO TEMPLO</span><b>{Math.min(100, profile.level*12 + Math.floor(profile.xp/10))}%</b></div><div className="evolution-track"><i style={{width:Math.min(100, profile.level*12 + Math.floor(profile.xp/10))+"%"}}/></div><div className="evolution-nodes"><span>SPAWN</span><span>AWAKENED</span><span>LEGEND</span></div></div>
    <div className="game-row">{games.map(g=><div className="game-pill" key={g.id}><i style={{background:g.accent}}>{g.name[0]}</i><span>{g.name}</span></div>)}</div>
    {customizing&&<div className="temple-customizer"><div><span>ATMOSFERA DO TEMPLO</span><small>Escolha a identidade visual do seu perfil.</small></div><div className="theme-options">{(Object.keys(themes) as Array<keyof typeof themes>).map(t=><button key={t} className={theme===t?"active":""} onClick={()=>choose(t)}><i className={"theme-dot "+t}/>{t.toUpperCase()}</button>)}</div></div>}
   </div>

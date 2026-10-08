@@ -70,3 +70,6 @@
 @media (prefers-reduced-motion:reduce){
  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+.temple-test-header{gap:14px}.temple-test-cards>div{min-width:0}
+@media(max-width:600px){.temple-test-header{top:14px!important;left:14px!important;right:14px!important;align-items:flex-start!important}.temple-test-header h1{font-size:20px!important}.temple-test-header>div:last-child{font-size:9px!important;padding:7px 8px!important}.temple-test-cards{bottom:18px!important;gap:7px!important;width:calc(100% - 24px)!important}.temple-test-cards>div{padding:12px 5px!important;font-size:11px}.temple-test-cards>div>div:last-child{font-size:10px}}

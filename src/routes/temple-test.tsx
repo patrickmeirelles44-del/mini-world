@@ -1,7 +1,7 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Sparkles } from "@react-three/drei";
 import { motion } from "motion/react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -51,6 +51,8 @@ function Scene() {
 }
 
 function TempleTest() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   return (
     <main style={{ minHeight: "100vh", background: "#05030d", color: "#fff", fontFamily: "Inter, system-ui, sans-serif", overflow: "hidden" }}>
       <header style={{ position: "absolute", zIndex: 5, top: 24, left: 24, right: 24, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -61,15 +63,21 @@ function TempleTest() {
         <div style={{ padding: "8px 12px", border: "1px solid rgba(167,139,250,.35)", borderRadius: 999, fontSize: 12, color: "#c4b5fd" }}>R3F + THREE + MOTION</div>
       </header>
 
-      <section style={{ position: "relative", height: "100vh", minHeight: 680 }}>
-        <Canvas
-          dpr={[1, 2]}
-          camera={{ position: [0, 0.3, 5.8], fov: 42 }}
-          gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
-          fallback={<div style={{ paddingTop: 180, textAlign: "center", color: "#fda4af" }}>WebGL não disponível neste dispositivo.</div>}
-        >
-          <Scene />
-        </Canvas>
+      <section style={{ position: "relative", height: "100svh", minHeight: "min(680px, 100svh)" }}>
+        {mounted ? (
+          <Canvas
+            dpr={typeof window !== "undefined" && window.matchMedia("(max-width: 700px)").matches ? [1, 1.25] : [1, 2]}
+            camera={{ position: [0, 0.3, 5.8], fov: 42 }}
+            gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+            fallback={<div style={{ paddingTop: 180, textAlign: "center", color: "#fda4af" }}>WebGL não disponível neste dispositivo.</div>}
+          >
+            <Scene />
+          </Canvas>
+        ) : (
+          <div style={{ position: "absolute", inset: 0, display: "grid", placeItems: "center", color: "#c4b5fd" }}>
+            Preparando o laboratório 3D…
+          </div>
+        )}
 
         <div style={{ position: "absolute", left: "50%", bottom: 46, transform: "translateX(-50%)", width: "min(760px, calc(100% - 32px))", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
           {["3D Core", "Lighting", "Particles"].map((label, i) => (

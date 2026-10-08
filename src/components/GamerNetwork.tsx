@@ -1,96 +1,87 @@
-import { useMemo, useState } from "react";
-import { Gamepad2, Home, Users, MessageCircle, Search, Bell, Plus, MapPin, Trophy, Shield, Sparkles, ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Gamepad2, Home, Users, MessageCircle, Search, Bell, Plus, MapPin, Trophy, Shield, Sparkles, ChevronRight, Heart, Send, LogOut, Settings } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 type Tab = "home" | "discover" | "communities" | "messages" | "profile";
+type Profile = { id:string; username:string; display_name:string; bio:string|null; avatar_url:string|null; city:string|null; state:string|null; country:string|null; level:number; xp:number; status:string };
+type Game = { id:string; name:string; slug:string; genre:string|null; accent:string };
+type Post = { id:string; body:string; image_url:string|null; created_at:string; profile_id:string; profile?:Profile; likes?:number; liked?:boolean; comments?:number };
 
-const games = [
-  { name: "VALORANT", tag: "FPS", color: "#ff4655", icon: "V" },
-  { name: "Fortnite", tag: "Battle Royale", color: "#7658ff", icon: "F" },
-  { name: "GTA V", tag: "Open World", color: "#d7a83f", icon: "G" },
-  { name: "Minecraft", tag: "Sandbox", color: "#55b66b", icon: "M" },
+const fallbackGames: Game[] = [
+ {id:"valorant",name:"VALORANT",slug:"valorant",genre:"FPS",accent:"#ff4655"},
+ {id:"fortnite",name:"Fortnite",slug:"fortnite",genre:"Battle Royale",accent:"#7658ff"},
+ {id:"gta-v",name:"GTA V",slug:"gta-v",genre:"Open World",accent:"#d7a83f"},
+ {id:"minecraft",name:"Minecraft",slug:"minecraft",genre:"Sandbox",accent:"#55b66b"},
 ];
+const badges = [{icon:"♛",name:"Lenda",rarity:"LENDÁRIA"},{icon:"⚔",name:"Competidor",rarity:"ÉPICA"},{icon:"✦",name:"Colecionador",rarity:"RARA"},{icon:"◈",name:"Primeiro Spawn",rarity:"COMUM"}];
 
-const badges = [
-  { icon: "♛", name: "Lenda", rarity: "LENDÁRIA" },
-  { icon: "⚔", name: "Competidor", rarity: "ÉPICA" },
-  { icon: "✦", name: "Colecionador", rarity: "RARA" },
-  { icon: "◈", name: "Primeiro Spawn", rarity: "COMUM" },
-];
-
-const communities = [
-  { name: "VALORANT BRASIL", members: "128 mil", game: "VALORANT", accent: "#ff4655" },
-  { name: "GTA V ONLINE", members: "94 mil", game: "GTA V", accent: "#d7a83f" },
-  { name: "MINECRAFT BR", members: "81 mil", game: "Minecraft", accent: "#55b66b" },
-];
-
-function TempleProfile() {
-  return (
-    <section className="temple-card">
-      <div className="temple-bg"><div className="orb orb-a" /><div className="orb orb-b" /><div className="grid-floor" /></div>
-      <div className="temple-content">
-        <div className="temple-top"><span>GAMER TEMPLE</span><button><Sparkles size={15}/> Personalizar</button></div>
-        <div className="temple-hero">
-          <div className="avatar-frame"><div className="avatar">P</div><span className="online" /></div>
-          <div><p className="eyebrow">NÍVEL 47 · COMPETIDOR</p><h1>Patrick</h1><p className="muted"><MapPin size={13}/> São Leopoldo · Brasil</p></div>
-        </div>
-        <div className="stats"><div><strong>38</strong><span>JOGOS</span></div><div><strong>142</strong><span>INSÍGNIAS</span></div><div><strong>1.8K</strong><span>XP</span></div><div><strong>23</strong><span>AMIGOS</span></div></div>
-        <div className="game-row">{games.map(g=><div className="game-pill" key={g.name}><i style={{background:g.color}}>{g.icon}</i><span>{g.name}</span></div>)}</div>
-      </div>
-    </section>
-  );
+function useCurrentProfile() {
+ const [profile,setProfile]=useState<Profile|null>(null);
+ useEffect(()=>{ let active=true; (async()=>{if(!supabase)return; const {data:{user}}=await supabase.auth.getUser(); if(!user)return; const {data}=await supabase.from("profiles").select("*").eq("id",user.id).single(); if(active)setProfile(data);})(); return()=>{active=false}},[]);
+ return {profile,setProfile};
 }
 
-function HomeFeed() {
-  return <div className="page-grid">
-    <main>
-      <TempleProfile />
-      <div className="section-head"><div><span className="eyebrow">ATIVIDADE</span><h2>Seu universo gamer</h2></div><button className="ghost"><Plus size={16}/> Publicar</button></div>
-      <article className="post">
-        <div className="post-head"><div className="mini-avatar">P</div><div><strong>Patrick</strong><span> · agora</span><small>Está jogando VALORANT</small></div><button>•••</button></div>
-        <p>Finalmente subi de elo. 🔥 Quem estiver procurando duo, manda convite.</p>
-        <div className="post-game"><span style={{background:"#ff4655"}}>V</span><div><strong>VALORANT</strong><small>Competitivo · Online</small></div><b>DIAMANTE</b></div>
-        <div className="post-actions"><button>♡ 24</button><button>💬 8 comentários</button><button>↗ Compartilhar</button></div>
-      </article>
-      <article className="post">
-        <div className="post-head"><div className="mini-avatar blue">L</div><div><strong>Lucas</strong><span> · 12 min</span><small>Entrou em uma comunidade</small></div></div>
-        <p>Alguém de São Leopoldo joga GTA Online hoje?</p>
-        <div className="location-card"><MapPin size={17}/><div><strong>Jogadores próximos</strong><small>14 gamers jogando GTA V perto de você</small></div><ChevronRight size={17}/></div>
-        <div className="post-actions"><button>♡ 11</button><button>💬 3 comentários</button><button>↗ Compartilhar</button></div>
-      </article>
-    </main>
-    <aside>
-      <div className="side-card"><div className="side-title"><span>INSÍGNIAS</span><Trophy size={16}/></div><div className="badge-grid">{badges.map(b=><div className="badge" key={b.name}><span>{b.icon}</span><strong>{b.name}</strong><small>{b.rarity}</small></div>)}</div><button className="full-btn">Ver coleção</button></div>
-      <div className="side-card"><div className="side-title"><span>COMUNIDADES</span><button>Ver todas</button></div>{communities.map(c=><div className="community-row" key={c.name}><i style={{background:c.accent}}>{c.game[0]}</i><div><strong>{c.name}</strong><small>{c.members} membros</small></div><ChevronRight size={15}/></div>)}</div>
-    </aside>
-  </div>;
+function TempleProfile({profile,games}:{profile:Profile;games:Game[]}) {
+ return <section className="temple-card"><div className="temple-bg"><div className="orb orb-a"/><div className="orb orb-b"/><div className="grid-floor"/></div><div className="temple-content">
+  <div className="temple-top"><span>GAMER TEMPLE</span><button><Sparkles size={15}/> Personalizar</button></div>
+  <div className="temple-hero"><div className="avatar-frame"><div className="avatar">{profile.avatar_url?<img src={profile.avatar_url} alt="Avatar"/>:profile.display_name?.[0]?.toUpperCase()||"G"}</div><span className={"online "+(profile.status!=="online"?"offline":"")}/></div><div><p className="eyebrow">NÍVEL {profile.level} · GAMER</p><h1>{profile.display_name}</h1><p className="muted"><MapPin size={13}/>{[profile.city,profile.state,profile.country].filter(Boolean).join(" · ")||"Brasil"}</p></div></div>
+  <div className="stats"><div><strong>{games.length}</strong><span>JOGOS</span></div><div><strong>—</strong><span>INSÍGNIAS</span></div><div><strong>{profile.xp}</strong><span>XP</span></div><div><strong>—</strong><span>AMIGOS</span></div></div>
+  <div className="game-row">{games.map(g=><div className="game-pill" key={g.id}><i style={{background:g.accent}}>{g.name[0]}</i><span>{g.name}</span></div>)}</div>
+ </div></section>
 }
 
-function Discover() {
-  return <div className="discover-page"><div className="discover-hero"><span className="eyebrow">DESCOBRIR</span><h1>Encontre quem joga<br/><em>o que você joga.</em></h1><p>Jogadores, comunidades e squads próximos de você.</p><div className="search-box"><Search size={19}/><input placeholder="Buscar jogador, jogo ou comunidade..." /></div></div><div className="section-head"><div><span className="eyebrow">PERTO DE VOCÊ</span><h2>Jogadores próximos</h2></div><span className="distance">até 10 km</span></div><div className="players">{["João","Lucas","Matheus","Rafael"].map((n,i)=><div className="player" key={n}><div className={"player-avatar a"+i}>{n[0]}</div><div><strong>{n}</strong><small>🎮 {games[i].name} · {2+i} km</small><span>Online agora</span></div><button>Ver perfil</button></div>)}</div></div>;
+function Composer({profile,onCreated}:{profile:Profile;onCreated:(p:Post)=>void}) {
+ const [body,setBody]=useState(""); const [busy,setBusy]=useState(false);
+ async function publish(){if(!supabase||!body.trim())return;setBusy(true);const {data,error}=await supabase.from("posts").insert({profile_id:profile.id,body:body.trim()}).select("*").single();setBusy(false);if(!error&&data){onCreated({...data,profile});setBody("")}}
+ return <div className="post composer"><div className="post-head"><div className="mini-avatar">{profile.display_name[0]}</div><div><strong>{profile.display_name}</strong><small>Compartilhe o que está rolando no seu universo.</small></div></div><textarea value={body} onChange={e=>setBody(e.target.value)} placeholder="O que você está jogando?..." maxLength={5000}/><div className="composer-foot"><span>{body.length}/5000</span><button className="primary" onClick={publish} disabled={busy||!body.trim()}><Send size={14}/>{busy?"Publicando":"Publicar"}</button></div></div>
 }
 
-function Communities() {
-  return <div className="communities-page"><div className="section-head"><div><span className="eyebrow">COMUNIDADES</span><h1>Seu Orkut gamer.</h1><p className="muted">Entre nas comunidades que fazem parte da sua história.</p></div><button className="primary"><Plus size={17}/> Criar comunidade</button></div><div className="community-grid">{communities.concat([{name:"FPS BRASIL",members:"56 mil",game:"FPS",accent:"#8b5cf6"},{name:"RPG & FANTASIA",members:"31 mil",game:"RPG",accent:"#d05cff"}]).map(c=><div className="community-card" key={c.name}><div className="community-cover" style={{"--accent":c.accent} as React.CSSProperties}><span>{c.game}</span></div><div className="community-body"><h3>{c.name}</h3><p>{c.members} membros</p><button>Entrar na comunidade <ChevronRight size={15}/></button></div></div>)}</div></div>;
+function HomeFeed({profile,games}:{profile:Profile;games:Game[]}) {
+ const [posts,setPosts]=useState<Post[]>([]); const [loading,setLoading]=useState(true);
+ async function load(){if(!supabase)return;const {data}=await supabase.from("posts").select("id,body,image_url,created_at,profile_id,profiles(id,username,display_name,bio,avatar_url,city,state,country,level,xp,status)").order("created_at",{ascending:false}).limit(30);const rows=(data||[]).map((p:any)=>({...p,profile:Array.isArray(p.profiles)?p.profiles[0]:p.profiles}));const ids=rows.map(p=>p.id);let likes:any[]=[];if(ids.length){const r=await supabase.from("likes").select("post_id,profile_id").in("post_id",ids);likes=r.data||[]}setPosts(rows.map(p=>({...p,likes:likes.filter(l=>l.post_id===p.id).length,liked:likes.some(l=>l.post_id===p.id&&l.profile_id===profile.id)})));setLoading(false)}
+ useEffect(()=>{load();if(!supabase)return;const ch=supabase.channel("forge-feed").on("postgres_changes",{event:"*",schema:"public",table:"posts"},()=>load()).subscribe();return()=>{supabase.removeChannel(ch)}},[profile.id]);
+ async function toggleLike(post:Post){if(!supabase)return;if(post.liked)await supabase.from("likes").delete().eq("post_id",post.id).eq("profile_id",profile.id);else await supabase.from("likes").insert({post_id:post.id,profile_id:profile.id});setPosts(ps=>ps.map(p=>p.id===post.id?{...p,liked:!p.liked,likes:(p.likes||0)+(p.liked?-1:1)}:p))}
+ return <div className="page-grid"><main><TempleProfile profile={profile} games={games}/><div className="section-head"><div><span className="eyebrow">ATIVIDADE</span><h2>Seu universo gamer</h2></div></div><Composer profile={profile} onCreated={p=>setPosts(ps=>[p,...ps])}/>{loading?<div className="post">Carregando atividade...</div>:posts.length===0?<div className="post empty-state"><h3>Seu primeiro post começa aqui.</h3><p>Conte para a comunidade o que você está jogando.</p></div>:posts.map(p=><article className="post" key={p.id}><div className="post-head"><div className="mini-avatar">{p.profile?.display_name?.[0]||"G"}</div><div><strong>{p.profile?.display_name||"Gamer"}</strong><span> · {new Date(p.created_at).toLocaleString("pt-BR")}</span><small>@{p.profile?.username}</small></div></div><p>{p.body}</p><div className="post-actions"><button onClick={()=>toggleLike(p)} className={p.liked?"liked":""}><Heart size={14} fill={p.liked?"currentColor":"none"}/> {p.likes||0}</button><button><MessageCircle size={14}/> {p.comments||0} comentários</button></div></article>)}</main><aside><div className="side-card"><div className="side-title"><span>INSÍGNIAS</span><Trophy size={16}/></div><div className="badge-grid">{badges.map(b=><div className="badge" key={b.name}><span>{b.icon}</span><strong>{b.name}</strong><small>{b.rarity}</small></div>)}</div></div><div className="side-card"><div className="side-title"><span>JOGOS DISPONÍVEIS</span></div>{games.slice(0,5).map(g=><div className="community-row" key={g.id}><i style={{background:g.accent}}>{g.name[0]}</i><div><strong>{g.name}</strong><small>{g.genre||"Game"}</small></div></div>)}</div></aside></div>
 }
 
-function Messages() {
-  return <div className="messages-page"><div className="section-head"><div><span className="eyebrow">CHAT</span><h1>Mensagens</h1></div><button className="ghost"><Plus size={16}/> Nova conversa</button></div><div className="chat-shell"><div className="conversation-list">{["Lucas","João","Rafael","Matheus"].map((n,i)=><div className={"conversation "+(i===0?"active":"")} key={n}><div className={"mini-avatar a"+i}>{n[0]}</div><div><strong>{n}</strong><small>{["Bora duo hoje?","Você subiu de elo?","Entrei na comunidade","🔥🔥🔥"][i]}</small></div><span>{i+1}</span></div>)}</div><div className="chat-empty"><MessageCircle size={35}/><h3>Seu chat gamer</h3><p>Converse com amigos, combine partidas e monte seu squad.</p></div></div></div>;
+function Discover({profile,games}:{profile:Profile;games:Game[]}) {
+ const [players,setPlayers]=useState<Profile[]>([]);const [query,setQuery]=useState("");const [sent,setSent]=useState<string[]>([]);
+ useEffect(()=>{(async()=>{if(!supabase)return;let q=supabase.from("profiles").select("*").neq("id",profile.id).limit(30);if(query.trim())q=q.or("display_name.ilike.%"+query.trim()+"%,username.ilike.%"+query.trim()+"%");const {data}=await q;setPlayers(data||[])})()},[profile.id,query]);
+ async function addFriend(id:string){if(!supabase)return;await supabase.from("friendships").upsert({requester_id:profile.id,addressee_id:id,status:"pending"});setSent(s=>[...s,id])}
+ return <div className="discover-page"><div className="discover-hero"><span className="eyebrow">DESCOBRIR</span><h1>Encontre quem joga<br/><em>o que você joga.</em></h1><p>Pesquise jogadores e encontre seu próximo squad.</p><div className="search-box"><Search size={19}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar jogador ou username..."/></div></div><div className="section-head"><div><span className="eyebrow">JOGADORES</span><h2>{query?"Resultados":"Sugestões para você"}</h2></div></div><div className="players">{players.map((n,i)=><div className="player" key={n.id}><div className={"player-avatar a"+(i%4)}>{n.display_name?.[0]}</div><div><strong>{n.display_name}</strong><small>@{n.username} · {n.city||"Brasil"}</small><span>{n.status==="online"?"Online agora":"Gamer"}</span></div><button onClick={()=>addFriend(n.id)} disabled={sent.includes(n.id)}>{sent.includes(n.id)?"Solicitado":"Adicionar"}</button></div>)}</div></div>
 }
 
-function Profile() {
-  return <div className="profile-page"><TempleProfile /><div className="profile-sections"><div><div className="section-head"><div><span className="eyebrow">COLEÇÃO</span><h2>Insígnias conquistadas</h2></div></div><div className="big-badges">{badges.concat(badges).map((b,i)=><div className="big-badge" key={i}><span>{b.icon}</span><strong>{b.name}</strong><small>{b.rarity}</small></div>)}</div></div><div><div className="section-head"><div><span className="eyebrow">JOGOS</span><h2>Minha biblioteca gamer</h2></div></div><div className="profile-games">{games.concat(games).map((g,i)=><div key={i} className="profile-game"><i style={{background:g.color}}>{g.icon}</i><div><strong>{g.name}</strong><small>{120+i*43} horas · principal</small></div><b>LV.{12+i}</b></div>)}</div></div></div></div>;
+function Communities({profile}:{profile:Profile}) {
+ const [communities,setCommunities]=useState<any[]>([]);const [joined,setJoined]=useState<string[]>([]);
+ async function load(){if(!supabase)return;const {data}=await supabase.from("communities").select("id,name,slug,description,member_count,game_id,games(name,accent)").order("member_count",{ascending:false});setCommunities(data||[]);const m=await supabase.from("community_members").select("community_id").eq("profile_id",profile.id);setJoined((m.data||[]).map(x=>x.community_id))}
+ useEffect(()=>{load()},[profile.id]);
+ async function toggle(c:any){if(!supabase)return;if(joined.includes(c.id))await supabase.from("community_members").delete().eq("community_id",c.id).eq("profile_id",profile.id);else await supabase.from("community_members").insert({community_id:c.id,profile_id:profile.id});await load()}
+ return <div className="communities-page"><div className="section-head"><div><span className="eyebrow">COMUNIDADES</span><h1>Seu Orkut gamer.</h1><p className="muted">Encontre sua turma, entre, participe e construa sua reputação.</p></div><button className="primary"><Plus size={17}/> Criar comunidade</button></div><div className="community-grid">{communities.map(c=>{const g=Array.isArray(c.games)?c.games[0]:c.games;return <div className="community-card" key={c.id}><div className="community-cover" style={{"--accent":g?.accent||"#8b5cf6"} as React.CSSProperties}><span>{g?.name||"FORGE"}</span></div><div className="community-body"><h3>{c.name}</h3><p>{c.member_count} membros</p><small>{c.description}</small><button onClick={()=>toggle(c)}>{joined.includes(c.id)?"Sair da comunidade":"Entrar na comunidade"} <ChevronRight size={15}/></button></div></div>})}</div></div>
 }
 
-export function GamerNetwork() {
-  const [tab,setTab]=useState<Tab>("home");
-  const title=useMemo(()=>({home:"Início",discover:"Descobrir",communities:"Comunidades",messages:"Mensagens",profile:"Meu perfil"}[tab]),[tab]);
-  return <div className="gamer-app">
-    <aside className="nav">
-      <div className="brand"><div className="brand-mark"><Gamepad2 size={20}/></div><span>FORGE</span></div>
-      <nav>{[["home",Home,"Início"],["discover",Search,"Descobrir"],["communities",Users,"Comunidades"],["messages",MessageCircle,"Mensagens"],["profile",Shield,"Meu perfil"]].map(([id,Icon,label])=><button className={tab===id?"selected":""} onClick={()=>setTab(id as Tab)} key={id as string}><Icon size={18}/><span>{label as string}</span></button>)}</nav>
-      <div className="nav-user"><div className="mini-avatar">P</div><div><strong>Patrick</strong><small>LV.47 · 1.8K XP</small></div></div>
-    </aside>
-    <div className="app-main"><header><div><span className="mobile-brand">FORGE</span><span className="header-title">{title}</span></div><div className="header-actions"><button><Search size={18}/></button><button><Bell size={18}/><i /></button><div className="mini-avatar">P</div></div></header><div className="content">{tab==="home"&&<HomeFeed/>}{tab==="discover"&&<Discover/>}{tab==="communities"&&<Communities/>}{tab==="messages"&&<Messages/>}{tab==="profile"&&<Profile/>}</div></div>
-    <div className="mobile-nav">{[["home",Home],["discover",Search],["communities",Users],["messages",MessageCircle],["profile",Shield]].map(([id,Icon])=><button className={tab===id?"selected":""} onClick={()=>setTab(id as Tab)} key={id as string}><Icon size={20}/><small>{id==="home"?"Início":id==="discover"?"Buscar":id==="communities"?"Comunidades":id==="messages"?"Chat":"Perfil"}</small></button>)}</div>
-  </div>;
+function Messages({profile}:{profile:Profile}) {
+ const [friends,setFriends]=useState<Profile[]>([]);const [active,setActive]=useState<Profile|null>(null);const [messages,setMessages]=useState<any[]>([]);const [body,setBody]=useState("");
+ useEffect(()=>{(async()=>{if(!supabase)return;const {data}=await supabase.from("friendships").select("requester_id,addressee_id").or("requester_id.eq."+profile.id+",addressee_id.eq."+profile.id).eq("status","accepted");const ids=(data||[]).map(f=>f.requester_id===profile.id?f.addressee_id:f.requester_id);if(ids.length){const r=await supabase.from("profiles").select("*").in("id",ids);setFriends(r.data||[])}})()},[profile.id]);
+ async function loadMessages(other:Profile){setActive(other);if(!supabase)return;const {data}=await supabase.from("messages").select("*").or("and(sender_id.eq."+profile.id+",recipient_id.eq."+other.id+"),and(sender_id.eq."+other.id+",recipient_id.eq."+profile.id+")").order("created_at");setMessages(data||[])}
+ async function send(){if(!supabase||!active||!body.trim())return;const {data}=await supabase.from("messages").insert({sender_id:profile.id,recipient_id:active.id,body:body.trim()}).select("*").single();if(data)setMessages(m=>[...m,data]);setBody("")}
+ useEffect(()=>{if(!supabase||!active)return;const ch=supabase.channel("forge-chat-"+active.id).on("postgres_changes",{event:"INSERT",schema:"public",table:"messages",filter:"recipient_id=eq."+profile.id},payload=>{if(payload.new.sender_id===active.id)setMessages(m=>[...m,payload.new])}).subscribe();return()=>{supabase.removeChannel(ch)}},[active?.id,profile.id]);
+ return <div className="messages-page"><div className="section-head"><div><span className="eyebrow">CHAT</span><h1>Mensagens</h1></div></div><div className="chat-shell"><div className="conversation-list">{friends.length===0?<div className="chat-empty small"><p>Adicione amigos para começar a conversar.</p></div>:friends.map(f=><button className={"conversation "+(active?.id===f.id?"active":"")} key={f.id} onClick={()=>loadMessages(f)}><div className="mini-avatar">{f.display_name[0]}</div><div><strong>{f.display_name}</strong><small>@{f.username}</small></div></button>)}</div><div className="chat-panel">{active?<><div className="chat-title"><strong>{active.display_name}</strong><small>@{active.username}</small></div><div className="chat-messages">{messages.map(m=><div className={"bubble "+(m.sender_id===profile.id?"mine":"")} key={m.id}>{m.body}</div>)}</div><div className="chat-compose"><input value={body} onChange={e=>setBody(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder="Digite uma mensagem..."/><button className="primary" onClick={send}><Send size={14}/></button></div></>:<div className="chat-empty"><MessageCircle size={35}/><h3>Seu chat gamer</h3><p>Adicione amigos e combine sua próxima partida.</p></div>}</div></div></div>
+}
+
+function Profile({profile,games,setProfile}:{profile:Profile;games:Game[];setProfile:(p:Profile)=>void}) {
+ const [name,setName]=useState(profile.display_name);const [bio,setBio]=useState(profile.bio||"");const [city,setCity]=useState(profile.city||"");const [editing,setEditing]=useState(false);const [mine,setMine]=useState<any[]>([]);
+ useEffect(()=>{(async()=>{if(!supabase)return;const {data}=await supabase.from("profile_games").select("game_id,hours,role,games(id,name,accent,genre)").eq("profile_id",profile.id);setMine(data||[])})()},[profile.id]);
+ async function save(){if(!supabase)return;const {data,error}=await supabase.from("profiles").update({display_name:name,bio,city}).eq("id",profile.id).select("*").single();if(!error&&data){setProfile(data);setEditing(false)}}
+ async function addGame(game:Game){if(!supabase)return;await supabase.from("profile_games").upsert({profile_id:profile.id,game_id:game.id,hours:0,role:"favorite"});const {data}=await supabase.from("profile_games").select("game_id,hours,role,games(id,name,accent,genre)").eq("profile_id",profile.id);setMine(data||[])}
+ async function signOut(){await supabase?.auth.signOut()}
+ return <div className="profile-page"><TempleProfile profile={profile} games={mine.map(x=>Array.isArray(x.games)?x.games[0]:x.games).filter(Boolean)}/><div className="profile-sections"><div><div className="section-head"><div><span className="eyebrow">IDENTIDADE</span><h2>Meu perfil</h2></div><button className="ghost" onClick={()=>setEditing(!editing)}><Settings size={14}/> {editing?"Cancelar":"Editar"}</button></div>{editing?<div className="post edit-form"><label>Nome<input value={name} onChange={e=>setName(e.target.value)}/></label><label>Cidade<input value={city} onChange={e=>setCity(e.target.value)} /></label><label>Bio<textarea value={bio} onChange={e=>setBio(e.target.value)} maxLength={500}/></label><button className="primary" onClick={save}>Salvar perfil</button></div>:<div className="post"><strong>{profile.display_name}</strong><p>{profile.bio||"Sua bio gamer ainda está vazia."}</p><small>@{profile.username} · {profile.city||"Brasil"}</small></div>}<button className="logout" onClick={signOut}><LogOut size={14}/> Sair da conta</button></div><div><div className="section-head"><div><span className="eyebrow">JOGOS</span><h2>Minha biblioteca gamer</h2></div></div><div className="profile-games">{mine.map(x=>{const g=Array.isArray(x.games)?x.games[0]:x.games;return g?<div key={g.id} className="profile-game"><i style={{background:g.accent}}>{g.name[0]}</i><div><strong>{g.name}</strong><small>{x.hours} horas · {x.role}</small></div><button onClick={()=>supabase?.from("profile_games").delete().eq("profile_id",profile.id).eq("game_id",g.id).then(()=>setMine(m=>m.filter(y=>y.game_id!==g.id)))}>×</button></div>:null})}</div><div className="game-picker">{games.filter(g=>!mine.some(m=>m.game_id===g.id)).map(g=><button key={g.id} onClick={()=>addGame(g)}><i style={{background:g.accent}}>{g.name[0]}</i>{g.name}</button>)}</div></div></div></div>
+}
+
+export function GamerNetwork(){
+ const [tab,setTab]=useState<Tab>("home");const {profile,setProfile}=useCurrentProfile();const [games,setGames]=useState<Game[]>([]);
+ useEffect(()=>{if(!supabase)return;supabase.from("games").select("*").order("name").then(({data})=>setGames(data||[]))},[]);
+ const activeGames=games.length?games:fallbackGames;
+ const title=useMemo(()=>({home:"Início",discover:"Descobrir",communities:"Comunidades",messages:"Mensagens",profile:"Meu perfil"}[tab]),[tab]);
+ if(!profile)return <div className="auth-screen"><div className="auth-card"><Gamepad2 size={28}/><p>Preparando seu perfil gamer...</p></div></div>;
+ return <div className="gamer-app"><aside className="nav"><div className="brand"><div className="brand-mark"><Gamepad2 size={20}/></div><span>FORGE</span></div><nav>{[["home",Home,"Início"],["discover",Search,"Descobrir"],["communities",Users,"Comunidades"],["messages",MessageCircle,"Mensagens"],["profile",Shield,"Meu perfil"]].map(([id,Icon,label])=><button className={tab===id?"selected":""} onClick={()=>setTab(id as Tab)} key={id as string}><Icon size={18}/><span>{label as string}</span></button>)}</nav><div className="nav-user"><div className="mini-avatar">{profile.display_name[0]}</div><div><strong>{profile.display_name}</strong><small>LV.{profile.level} · {profile.xp} XP</small></div></div></aside><div className="app-main"><header><div><span className="mobile-brand">FORGE</span><span className="header-title">{title}</span></div><div className="header-actions"><button><Search size={18}/></button><button><Bell size={18}/><i/></button><div className="mini-avatar">{profile.display_name[0]}</div></div></header><div className="content">{tab==="home"&&<HomeFeed profile={profile} games={activeGames}/>} {tab==="discover"&&<Discover profile={profile} games={activeGames}/>} {tab==="communities"&&<Communities profile={profile}/>} {tab==="messages"&&<Messages profile={profile}/>} {tab==="profile"&&<Profile profile={profile} games={activeGames} setProfile={setProfile}/>}</div></div><div className="mobile-nav">{[["home",Home],["discover",Search],["communities",Users],["messages",MessageCircle],["profile",Shield]].map(([id,Icon])=><button className={tab===id?"selected":""} onClick={()=>setTab(id as Tab)} key={id as string}><Icon size={20}/><small>{id==="home"?"Início":id==="discover"?"Buscar":id==="communities"?"Comunidades":id==="messages"?"Chat":"Perfil"}</small></button>)}</div></div>
 }

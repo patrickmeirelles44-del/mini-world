@@ -15,13 +15,12 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const [reset, setReset] = useState(false);
 
   useEffect(() => {
-    if (!supabase) { setSession(null); return; }
+    if (!supabase) { setSession({ demo: true }); return; }
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
     const { data } = supabase.auth.onAuthStateChange((_event, next) => setSession(next));
     return () => data.subscription.unsubscribe();
   }, []);
 
-  if (!supabase) return <div className="auth-screen"><div className="auth-card"><Gamepad2 size={32}/><h1>FORGE</h1><p>Configure VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY.</p></div></div>;
   if (session === undefined) return <div className="auth-screen"><div className="auth-card"><Gamepad2 size={28}/><p>Carregando FORGE...</p></div></div>;
   if (session) return <>{children}</>;
 

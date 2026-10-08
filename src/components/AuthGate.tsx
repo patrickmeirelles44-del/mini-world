@@ -12,6 +12,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [reset, setReset] = useState(false);
 
   useEffect(() => {
     if (!supabase) { setSession(null); return; }
@@ -23,6 +24,8 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   if (!supabase) return <div className="auth-screen"><div className="auth-card"><Gamepad2 size={32}/><h1>FORGE</h1><p>Configure VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY.</p></div></div>;
   if (session === undefined) return <div className="auth-screen"><div className="auth-card"><Gamepad2 size={28}/><p>Carregando FORGE...</p></div></div>;
   if (session) return <>{children}</>;
+
+  async function resetPassword() { setError(""); if (!email) { setError("Digite seu e-mail primeiro."); return; } setBusy(true); const { error } = await supabase!.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin }); setBusy(false); if (error) setError(error.message); else setError("Enviamos um link de recuperação para seu e-mail."); }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault(); setError(""); setBusy(true);
@@ -44,6 +47,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
         <label>E-mail<input type="email" value={email} onChange={e=>setEmail(e.target.value)} required/></label>
         <label>Senha<input type="password" value={password} onChange={e=>setPassword(e.target.value)} required minLength={6}/></label>
         {error && <div className="auth-error">{error}</div>}
+        {mode === "login" && <button type="button" className="auth-switch" onClick={resetPassword} disabled={busy}>Esqueci minha senha</button>}
         <button className="primary auth-submit" disabled={busy}>{busy ? "Entrando..." : mode === "login" ? <><LogIn size={16}/> Entrar</> : <><UserPlus size={16}/> Criar conta</>}</button>
       </form>
       <button className="auth-switch" onClick={()=>{setMode(mode==="login"?"signup":"login");setError("")}}>

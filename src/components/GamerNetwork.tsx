@@ -69,7 +69,7 @@ function TempleProfile({profile,games}:{profile:Profile;games:Game[]}) {
  const bgY=useTransform(pointerY,[-1,1],[-12,12]);
  const contentX=useTransform(pointerX,[-1,1],[-5,5]);
  const contentY=useTransform(pointerY,[-1,1],[-3,3]);
- const handlePointerMove=(e:React.PointerEvent)=>{const r=e.currentTarget.getBoundingClientRect();pointerX.set((e.clientX-r.left)/r.width*2-1);pointerY.set((e.clientY-r.top)/r.height*2-1)};
+ const handlePointerMove=(e:React.PointerEvent)=>{if(window.matchMedia("(pointer: coarse)").matches)return;const r=e.currentTarget.getBoundingClientRect();if(!r.width||!r.height)return;pointerX.set((e.clientX-r.left)/r.width*2-1);pointerY.set((e.clientY-r.top)/r.height*2-1)};
  const resetPointer=()=>{pointerX.set(0);pointerY.set(0)};
  const [customizing,setCustomizing]=useState(false);
  const xpNext=Math.max(100,profile.level*100);
@@ -151,7 +151,7 @@ function Profile({profile,games,setProfile}:{profile:Profile;games:Game[];setPro
 export function GamerNetwork(){
  const [tab,setTab]=useState<Tab>("home");const {profile,setProfile}=useCurrentProfile();const [games,setGames]=useState<Game[]>([]);
  const [deviceMode,setDeviceMode]=useState<"mobile"|"tablet"|"desktop">("desktop");
- useEffect(()=>{const detect=()=>{const width=window.innerWidth;const touch=window.matchMedia("(pointer: coarse)").matches;setDeviceMode(width<=600?"mobile":width<=1024||(touch&&width<=1100)?"tablet":"desktop")};detect();window.addEventListener("resize",detect);window.addEventListener("orientationchange",detect);return()=>{window.removeEventListener("resize",detect);window.removeEventListener("orientationchange",detect)}},[]);
+ useEffect(()=>{const detect=()=>{const width=Math.min(window.innerWidth,document.documentElement.clientWidth||window.innerWidth,window.visualViewport?.width||window.innerWidth);const touch=window.matchMedia("(pointer: coarse)").matches;setDeviceMode(width<=600?"mobile":width<=1024||(touch&&width<=1100)?"tablet":"desktop")};detect();window.addEventListener("resize",detect);window.addEventListener("orientationchange",detect);window.visualViewport?.addEventListener("resize",detect);return()=>{window.removeEventListener("resize",detect);window.removeEventListener("orientationchange",detect);window.visualViewport?.removeEventListener("resize",detect)}},[]);
  useEffect(()=>{if(!supabase)return;supabase.from("games").select("*").order("name").then(({data})=>setGames(data||[]))},[]);
  const activeGames=games.length?games:fallbackGames;
  const title=useMemo(()=>({home:"Início",discover:"Descobrir",communities:"Comunidades",messages:"Mensagens",profile:"Meu perfil"}[tab]),[tab]);

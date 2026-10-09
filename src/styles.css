@@ -221,3 +221,94 @@ html,body,#root{width:100%;max-width:100%;overflow-x:clip;background:#090711}
  .content{padding-bottom:calc(105px + env(safe-area-inset-bottom))!important}
  .mobile-nav{min-height:62px}
 }
+
+
+/* FORGE mobile-wide polish: consistent spacing, responsive cards, safe-area navigation */
+:root{color-scheme:dark;--forge-bg:#090710;--forge-panel:#110d1a;--forge-line:rgba(167,139,250,.2);--forge-purple:#a78bfa;--forge-cyan:#67e8f9}
+html{min-height:100%;background:var(--forge-bg);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{min-height:100%;margin:0;background:var(--forge-bg)}
+.gamer-app{min-height:100dvh;background:radial-gradient(ellipse at 50% -15%,rgba(109,40,217,.14),transparent 50%),#090710}
+.app-main{min-width:0}
+.app-main>header{position:sticky;top:0;z-index:40;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(9,7,16,.92);border-bottom:1px solid rgba(167,139,250,.12)}
+.content{min-width:0}
+.post,.side-card,.discover-hero,.communities-page,.messages-page,.profile-page{min-width:0}
+.post,.side-card{border-color:rgba(167,139,250,.16)}
+button,input,textarea{font:inherit}
+button{-webkit-tap-highlight-color:transparent}
+input,textarea{font-size:16px}
+img{max-width:100%}
+.mobile-brand{align-items:center;gap:9px}
+.mobile-brand img{width:29px;height:29px;object-fit:contain}
+.mobile-nav{padding-bottom:calc(7px + env(safe-area-inset-bottom))!important;min-height:calc(64px + env(safe-area-inset-bottom));box-sizing:border-box}
+.mobile-nav button{min-height:48px;justify-items:center;align-content:center}
+.mobile-nav button svg{width:22px;height:22px}
+.mobile-nav button small{font-size:10px!important;line-height:1.2;letter-spacing:.01em}
+.home-welcome{isolation:isolate}
+.home-welcome-copy{min-width:0}
+.home-welcome-copy p{line-height:1.7}
+.home-welcome-stats{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.temple-card{isolation:isolate}
+.temple-card .temple-content{min-width:0}
+.temple-card .temple-top button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px}
+.temple-card .xp-wrap>div:first-child,.temple-evolution>div:first-child{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.temple-card .xp-wrap b,.temple-evolution b{white-space:nowrap}
+.temple-card .stats>div{min-width:0}
+.temple-card .stats span{display:block}
+.players,.community-grid,.profile-games,.game-picker{min-width:0}
+.player{min-width:0;gap:12px}
+.player>div:nth-child(2){min-width:0;flex:1}
+.player>div:nth-child(2) strong,.player>div:nth-child(2) small{overflow-wrap:anywhere}
+.search-box{min-width:0}
+.search-box input{min-width:0;width:100%}
+@media(max-width:850px){
+ .app-main>header{height:62px;box-sizing:border-box}
+ .header-actions{display:flex;align-items:center}
+ .header-actions>button{display:grid;place-items:center;width:40px;height:40px;border-radius:14px}
+ .content{box-sizing:border-box;padding-top:16px}
+ .page-grid,.profile-sections{grid-template-columns:minmax(0,1fr)!important}
+ .page-grid aside{display:none}
+ .section-head{gap:10px;align-items:center}
+ .section-head h2{font-size:clamp(19px,5vw,24px)}
+ .post{padding:15px;border-radius:16px}
+ .post-head{min-width:0;gap:10px}
+ .post-head>div:last-child{min-width:0}
+ .post-head strong,.post-head small{overflow-wrap:anywhere}
+ .composer textarea{box-sizing:border-box;font-size:16px;line-height:1.5}
+ .composer-foot{gap:8px;flex-wrap:wrap}
+ .composer-foot button{min-height:38px}
+ .discover-hero{padding:22px 18px;border-radius:18px}
+ .discover-hero h1{font-size:clamp(28px,8vw,38px);line-height:1.1;overflow-wrap:anywhere}
+ .discover-hero p{line-height:1.65}
+ .players{display:grid;gap:10px}
+ .player{padding:13px;border-radius:15px;display:flex;align-items:center}
+ .player button{flex-shrink:0;min-height:38px;padding:0 12px}
+ .communities-page .community-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .messages-page .chat-shell{min-width:0;max-width:100%;overflow:hidden}
+ .profile-page,.profile-sections,.profile-sections>div{min-width:0;width:100%}
+ .profile-games,.game-picker{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+ .profile-game{min-width:0}
+}
+@media(max-width:420px){
+ .content{padding-left:12px!important;padding-right:12px!important}
+ .home-welcome{min-height:250px;padding:22px 17px!important}
+ .home-welcome-copy h1{font-size:29px!important;letter-spacing:-.05em}
+ .home-welcome-copy p{font-size:13px;max-width:245px;line-height:1.65}
+ .home-welcome-stats{font-size:11px;gap:8px 12px}
+ .temple-card .temple-content{padding:15px!important}
+ .temple-top>span{font-size:9px!important;letter-spacing:.09em!important}
+ .temple-top button{font-size:10px!important;gap:5px!important;padding:8px!important;min-height:38px!important}
+ .temple-hero{grid-template-columns:66px minmax(0,1fr)!important;gap:11px!important}
+ .temple-hero .avatar-frame{width:66px!important;height:66px!important}
+ .temple-hero .identity h1{font-size:clamp(23px,7vw,30px)!important}
+ .temple-card .stats strong{font-size:18px!important}
+ .temple-card .stats span{font-size:7px!important}
+ .communities-page .community-grid{grid-template-columns:minmax(0,1fr)!important}
+ .player{gap:9px;padding:11px}
+ .player button{font-size:11px;padding:0 9px}
+ .mobile-nav{padding-left:4px!important;padding-right:4px!important}
+ .mobile-nav button small{font-size:9px!important}
+}
+@media(hover:none),(pointer:coarse){
+ .temple-card{transform:none!important;rotate:none!important}
+ .temple-card button,.mobile-nav button,.header-actions button{touch-action:manipulation}
+}

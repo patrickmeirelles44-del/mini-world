@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" fill="none">
+<defs>
+ <linearGradient id="stone" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#392653"/><stop offset=".48" stop-color="#171022"/><stop offset="1" stop-color="#080711"/></linearGradient>
+ <linearGradient id="edge" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#68449a" stop-opacity=".05"/><stop offset=".5" stop-color="#c5a0ff" stop-opacity=".9"/><stop offset="1" stop-color="#68449a" stop-opacity=".05"/></linearGradient>
+ <radialGradient id="portal"><stop stop-color="#b46aff" stop-opacity=".44"/><stop offset=".45" stop-color="#7628cf" stop-opacity=".2"/><stop offset="1" stop-color="#28123f" stop-opacity="0"/></radialGradient>
+ <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8deaff"/><stop offset="1" stop-color="#7d4fff"/></linearGradient>
+ <filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="9"/></filter>
+ <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.5"/></filter>
+ <pattern id="stars" width="72" height="72" patternUnits="userSpaceOnUse"><circle cx="11" cy="18" r="1.5" fill="#c8a4ff" opacity=".55"/><circle cx="52" cy="47" r="1" fill="#8deaff" opacity=".42"/><path d="M34 7v8M30 11h8" stroke="#c8a4ff" stroke-opacity=".35"/></pattern>
+ <pattern id="floor" width="72" height="48" patternUnits="userSpaceOnUse"><path d="M0 0H72M0 0L-40 48M72 0L112 48M36 0V48" stroke="#9b70d8" stroke-opacity=".18" stroke-width="1"/></pattern>
+</defs>
+<!-- atmospheric depth -->
+<ellipse cx="600" cy="425" rx="410" ry="385" fill="url(#portal)"/>
+<circle cx="600" cy="350" r="260" stroke="#9d6fe0" stroke-opacity=".24" stroke-width="2"/>
+<circle cx="600" cy="350" r="230" stroke="#6f49a5" stroke-opacity=".2" stroke-dasharray="3 13"/>
+<path d="M140 710V270Q140 85 325 85H875Q1060 85 1060 270V710" stroke="#674b91" stroke-opacity=".5" stroke-width="26"/>
+<path d="M140 710V270Q140 85 325 85H875Q1060 85 1060 270V710" stroke="url(#edge)" stroke-width="2"/>
+<!-- outer masonry ribs -->
+<path d="M190 700V288Q190 145 335 145H865Q1010 145 1010 288V700" stroke="#241a34" stroke-width="48"/>
+<path d="M190 700V288Q190 145 335 145H865Q1010 145 1010 288V700" stroke="#7552a5" stroke-opacity=".65" stroke-width="3"/>
+<path d="M245 700V300Q245 195 350 195H850Q955 195 955 300V700" stroke="#110c1d" stroke-width="34"/>
+<path d="M245 700V300Q245 195 350 195H850Q955 195 955 300V700" stroke="#b18ae8" stroke-opacity=".36" stroke-width="2"/>
+<!-- arch stones -->
+<g fill="url(#stone)" stroke="#674a8e" stroke-opacity=".75" stroke-width="2">
+ <path d="M260 302Q260 178 385 178H815Q940 178 940 302V322H908V302Q908 210 815 210H385Q292 210 292 302V322H260Z"/>
+ <path d="M325 705V350Q325 255 420 255H780Q875 255 875 350V705H842V350Q842 288 780 288H420Q358 288 358 350V705Z"/>
+ <path d="M385 700V388Q385 320 453 320H747Q815 320 815 388V700H790V388Q790 345 747 345H453Q410 345 410 388V700Z"/>
+</g>
+<!-- rune panels -->
+<g stroke="#9e73da" stroke-opacity=".72" stroke-width="2" fill="#241633">
+ <path d="M82 330L126 286 170 330V420L126 458 82 420Z"/><path d="M103 337L126 314 149 337V409L126 430 103 409Z" fill="none"/>
+ <path d="M1030 330L1074 286 1118 330V420L1074 458 1030 420Z"/><path d="M1051 337L1074 314 1097 337V409L1074 430 1051 409Z" fill="none"/>
+</g>
+<g stroke="#b98cff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".8"><path d="M126 350v48m-15-24h30M1074 350v48m-15-24h30"/></g>
+<!-- torch sconces -->
+<g>
+ <path d="M110 555H210L196 578H124Z" fill="url(#stone)" stroke="#8860b4" stroke-width="2"/><path d="M132 578H188V715H132Z" fill="url(#stone)" stroke="#69498c" stroke-width="2"/><path d="M150 600H170V705H150Z" fill="#9c55ee" opacity=".45" filter="url(#soft)"/><path d="M150 600H170V705H150Z" fill="#bc88ff" opacity=".72"/>
+ <path d="M990 555H1090L1076 578H1004Z" fill="url(#stone)" stroke="#8860b4" stroke-width="2"/><path d="M1012 578H1068V715H1012Z" fill="url(#stone)" stroke="#69498c" stroke-width="2"/><path d="M1030 600H1050V705H1030Z" fill="#9c55ee" opacity=".45" filter="url(#soft)"/><path d="M1030 600H1050V705H1030Z" fill="#bc88ff" opacity=".72"/>
+ <path d="M160 570C128 540 151 514 160 493C177 520 190 540 160 570Z" fill="#b85bff" opacity=".85" filter="url(#glow)"/><path d="M160 565C145 541 160 524 163 514C180 539 177 553 160 565Z" fill="#e6c8ff"/>
+ <path d="M1040 570C1008 540 1031 514 1040 493C1057 520 1070 540 1040 570Z" fill="#b85bff" opacity=".85" filter="url(#glow)"/><path d="M1040 565C1025 541 1040 524 1043 514C1060 539 1057 553 1040 565Z" fill="#e6c8ff"/>
+</g>
+<!-- portal rune -->
+<circle cx="600" cy="350" r="170" stroke="#9d4dff" stroke-width="18" opacity=".17" filter="url(#glow)"/>
+<circle cx="600" cy="350" r="160" stroke="url(#edge)" stroke-width="4"/>
+<circle cx="600" cy="350" r="143" stroke="#a75dff" stroke-width="1.5" stroke-dasharray="4 10" opacity=".9"/>
+<circle cx="600" cy="350" r="128" fill="url(#portal)" stroke="#b78bff" stroke-opacity=".65" stroke-width="2"/>
+<g stroke="#d7b5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".9">
+ <path d="M600 224l17 33-17 33-17-33Z"/><path d="M600 410l17 33-17 33-17-33Z"/>
+ <path d="M474 350l33-17 33 17-33 17Z"/><path d="M660 350l33-17 33 17-33 17Z"/>
+ <path d="M510 260l18 18m0-18-18 18M672 422l18 18m0-18-18 18"/>
+</g>
+<circle cx="600" cy="350" r="92" stroke="#9e4cff" stroke-width="2" opacity=".65"/>
+<circle cx="600" cy="350" r="76" fill="#7e38d1" fill-opacity=".08" stroke="#b78bff" stroke-opacity=".4"/>
+<!-- lower dais, floor perspective -->
+<path d="M0 735L120 675H1080L1200 735V900H0Z" fill="#0a0812" fill-opacity=".86"/>
+<path d="M0 735L120 675H1080L1200 735" stroke="#8d65c4" stroke-opacity=".65" stroke-width="3"/>
+<path d="M0 758L1200 758V900H0Z" fill="url(#floor)" opacity=".7"/>
+<path d="M600 680L360 900M600 680L470 900M600 680L600 900M600 680L730 900M600 680L840 900M600 680L120 785M600 680L0 825M600 680L1080 785M600 680L1200 825" stroke="#9866d1" stroke-opacity=".16"/>
+<ellipse cx="600" cy="752" rx="370" ry="50" stroke="#b18bff" stroke-opacity=".75" stroke-width="3"/>
+<ellipse cx="600" cy="752" rx="300" ry="35" stroke="#65dff8" stroke-opacity=".55" stroke-width="2"/>
+<!-- floating embers -->
+<g fill="#d9b5ff"><path d="M285 280l7 12-7 12-7-12Z"/><path d="M917 390l6 10-6 10-6-10Z"/><path d="M340 515l5 8-5 8-5-8Z"/><path d="M870 540l5 8-5 8-5-8Z"/><circle cx="255" cy="470" r="3"/><circle cx="948" cy="470" r="3"/></g>
+<rect width="1200" height="900" fill="url(#stars)" opacity=".55"/>
+<rect x="2" y="2" width="1196" height="896" rx="20" stroke="#9c70d5" stroke-opacity=".32" stroke-width="3"/>
+</svg>

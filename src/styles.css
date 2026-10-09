@@ -73,3 +73,27 @@
 
 .temple-test-header{gap:14px}.temple-test-cards>div{min-width:0}
 @media(max-width:600px){.temple-test-header{top:14px!important;left:14px!important;right:14px!important;align-items:flex-start!important}.temple-test-header h1{font-size:20px!important}.temple-test-header>div:last-child{font-size:9px!important;padding:7px 8px!important}.temple-test-cards{bottom:18px!important;gap:7px!important;width:calc(100% - 24px)!important}.temple-test-cards>div{padding:12px 5px!important;font-size:11px}.temple-test-cards>div>div:last-child{font-size:10px}}
+
+
+/* FORGE viewport calibration: keep the experience inside the real device width */
+html,body,#root,.gamer-app,.app-main,.content,.page-grid,.page-grid>main{min-width:0;max-width:100%}
+html,body{overflow-x:clip}
+.gamer-app{width:100%;overflow-x:clip}
+.app-main{min-width:0}
+.content{width:100%;overflow-x:clip}
+.temple-card{width:100%;max-width:100%;margin-inline:0;transform-origin:center center}
+.temple-3d{left:0;right:0;width:100%;overflow:hidden}
+.temple-3d canvas{position:absolute!important;inset:0;width:100%!important;height:100%!important;max-width:100%!important;display:block}
+@media (max-width:600px){
+  .content{padding-left:10px;padding-right:10px}
+  .page-grid,.page-grid>main{width:100%;margin-inline:0}
+  .temple-card:has(.temple-3d){width:100%;margin-inline:0;transform:none!important;rotate:none!important}
+  .temple-card:has(.temple-3d) .temple-content{width:100%;max-width:100%;min-width:0}
+  .temple-card:has(.temple-3d) .temple-3d{left:0;right:0;width:100%;transform:none!important}
+  .temple-card:has(.temple-3d) .temple-hero{width:100%;min-width:0}
+  .temple-card:has(.temple-3d) .identity{flex:1 1 0;max-width:calc(100% - 78px);overflow-wrap:anywhere}
+  .temple-card:has(.temple-3d) .temple-top{width:100%;min-width:0}
+}
+@media (hover:none),(pointer:coarse){
+  .temple-card:has(.temple-3d){transform:none!important;rotate:none!important}
+}

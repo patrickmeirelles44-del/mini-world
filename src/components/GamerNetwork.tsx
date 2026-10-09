@@ -55,8 +55,19 @@ class ThreeDErrorBoundary extends Component<{children:ReactNode;fallback:ReactNo
 }
 function supportsWebGL(){try{const canvas=document.createElement("canvas");return !!(window.WebGLRenderingContext&&(canvas.getContext("webgl2")||canvas.getContext("webgl")||canvas.getContext("experimental-webgl")))}catch{return false}}
 function ThreeDFallback(){return <div className="temple-3d-fallback"><div className="fallback-core">✦</div><strong>Renderização 3D indisponível</strong><span>Verifique se o navegador permite WebGL e recarregue a página.</span></div>}
-function Temple3D({accent}:{accent:string}){const [mounted,setMounted]=useState(false);const [webgl,setWebgl]=useState(false);useEffect(()=>{setWebgl(supportsWebGL());setMounted(true)},[]);return <div className="temple-3d" aria-label="Gamer Temple 3D">{!mounted?<div className="temple-3d-loading" aria-label="Preparando experiência 3D"><span/><span/><span/></div>:!webgl?<ThreeDFallback/>:<ThreeDErrorBoundary fallback={<ThreeDFallback/>}><Canvas frameloop="always" camera={{position:[0,1.65,6.4],fov:36}} dpr={window.matchMedia("(max-width: 700px)").matches?[1,1.25]:[1,1.5]} gl={{antialias:true,alpha:true,powerPreference:"high-performance"}}><color attach="background" args={["#08070c"]}/><fog attach="fog" args={["#08070c",4,9]}/><ambientLight intensity={.28}/><hemisphereLight intensity={.35} groundColor="#050409" color="#b9a0ff"/><pointLight position={[0,2.6,2.5]} color={accent} intensity={24} distance={8}/><pointLight position={[-3,2,2]} color="#ff7b18" intensity={8} distance={5}/><pointLight position={[3,2,2]} color="#7c3aed" intensity={10} distance={5}/><TempleScene accent={accent}/></Canvas></ThreeDErrorBoundary>}</div>}
-
+function Temple3D({accent}:{accent:string}){
+ return <div className="temple-3d temple-static" aria-label="Templo gamer ilustrado">
+  <div className="static-temple-scene">
+   <div className="static-temple-halo"/><div className="static-temple-ring ring-one"/><div className="static-temple-ring ring-two"/>
+   <div className="static-temple-arch"><i className="arch-inner"/><i className="arch-glow"/></div>
+   <div className="static-temple-column column-left"><i/></div><div className="static-temple-column column-right"><i/></div>
+   <div className="static-temple-pedestal"><i/><b>✦</b></div>
+   <div className="static-temple-avatar">{/* Deliberately static visual: reliable on every phone and browser. */}<span>✦</span></div>
+   <div className="static-temple-floor"/>
+   <span className="static-temple-rune rune-left">◈</span><span className="static-temple-rune rune-right">✧</span><span className="static-temple-rune rune-top">✦</span>
+  </div>
+ </div>
+}
 function TempleProfile({profile,games}:{profile:Profile;games:Game[]}) {
  const themes={nexus:"temple-nexus",inferno:"temple-inferno",cyber:"temple-cyber",void:"temple-void"} as const;
  const [theme,setTheme]=useState<keyof typeof themes>("nexus");

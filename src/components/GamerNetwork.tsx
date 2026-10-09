@@ -56,15 +56,18 @@ class ThreeDErrorBoundary extends Component<{children:ReactNode;fallback:ReactNo
 function supportsWebGL(){try{const canvas=document.createElement("canvas");return !!(window.WebGLRenderingContext&&(canvas.getContext("webgl2")||canvas.getContext("webgl")||canvas.getContext("experimental-webgl")))}catch{return false}}
 function ThreeDFallback(){return <div className="temple-3d-fallback"><div className="fallback-core">✦</div><strong>Renderização 3D indisponível</strong><span>Verifique se o navegador permite WebGL e recarregue a página.</span></div>}
 function Temple3D({accent}:{accent:string}){
- return <div className="temple-3d temple-static" aria-label="Templo gamer ilustrado">
+ return <div className="temple-3d temple-static" aria-hidden="true" style={{"--temple-accent":accent} as React.CSSProperties}>
   <div className="static-temple-scene">
+   <div className="temple-layer temple-layer-back"><i/><i/><i/></div>
    <div className="static-temple-halo"/><div className="static-temple-ring ring-one"/><div className="static-temple-ring ring-two"/>
+   <div className="temple-layer temple-layer-orbits"><i/><i/><i/></div>
    <div className="static-temple-arch"><i className="arch-inner"/><i className="arch-glow"/></div>
    <div className="static-temple-column column-left"><i/></div><div className="static-temple-column column-right"><i/></div>
    <div className="static-temple-pedestal"><i/><b>✦</b></div>
-   <div className="static-temple-avatar">{/* Deliberately static visual: reliable on every phone and browser. */}<span>✦</span></div>
+   <div className="static-temple-avatar"><span>F</span></div>
    <div className="static-temple-floor"/>
    <span className="static-temple-rune rune-left">◈</span><span className="static-temple-rune rune-right">✧</span><span className="static-temple-rune rune-top">✦</span>
+   <div className="temple-layer temple-layer-front"><i/><i/></div>
   </div>
  </div>
 }

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">FORGE — símbolo F</title>
+  <defs><linearGradient id="metal" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#EAE6F0"/><stop offset=".5" stop-color="#A78BFA"/><stop offset="1" stop-color="#6A2BE2"/></linearGradient><linearGradient id="edge" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#C026FF"/><stop offset="1" stop-color="#6A2BE2"/></linearGradient></defs>
+  <rect width="128" height="128" rx="25" fill="#08060E"/>
+  <path d="M64 9 111 26 108 78 64 119 20 78 17 26Z" fill="#100B19" stroke="url(#edge)" stroke-width="3"/>
+  <path d="M64 18 101 31 98 75 64 106 30 75 27 31Z" fill="none" stroke="#8B5CF6" stroke-opacity=".55" stroke-width="1.5"/>
+  <path d="M43 37H84V50H56V60H78V73H56V94H43Z" fill="url(#metal)"/>
+  <path d="M56 60H78L68 73H56Z" fill="#C026FF"/>
+  <path d="M36 87 64 108 92 87" fill="none" stroke="#00D4FF" stroke-opacity=".75" stroke-width="1.5"/>
+</svg>

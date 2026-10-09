@@ -437,3 +437,25 @@ img{max-width:100%}
  .mobile-nav button small{font-size:9px!important}
 }
 @media(prefers-reduced-motion:reduce){.home-orbit,.home-crystal,.temple-layer i{animation:none!important}}
+
+/* Final component coverage: badges, feed metadata, community rows and 2D rune layer */
+.temple-layer-orbits i{position:absolute;left:50%;top:38%;width:min(57%,390px);height:44%;border:1px solid rgba(167,139,250,.13);border-radius:50%;transform:translateX(-50%) rotate(-22deg)}
+.temple-layer-orbits i:nth-child(2){width:min(66%,450px);transform:translateX(-50%) rotate(22deg);border-color:rgba(34,211,238,.12)}
+.temple-layer-orbits i:nth-child(3){width:min(74%,510px);height:34%;top:44%;transform:translateX(-50%) rotate(-8deg);border-color:rgba(167,139,250,.1)}
+.temple-layer-runes span{position:absolute;display:grid;place-items:center;width:27px;height:27px;border:1px solid rgba(196,181,253,.22);border-radius:9px;background:rgba(15,10,23,.6);color:#c4b5fd;font-size:12px;box-shadow:0 0 24px rgba(139,92,246,.09);animation:forge-float 7s ease-in-out infinite}
+.temple-layer-runes span:nth-child(1){left:12%;top:39%}
+.temple-layer-runes span:nth-child(2){right:13%;top:32%;animation-delay:-2s}
+.temple-layer-runes span:nth-child(3){left:23%;bottom:20%;animation-delay:-4s}
+.temple-layer-runes span:nth-child(4){right:24%;bottom:17%;color:var(--cyan);animation-delay:-1s}
+.side-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:13px;color:#cfc2df;font-size:10px;font-weight:800;letter-spacing:.14em}
+.side-title svg{color:#c4b5fd}
+.badge-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.badge{display:grid;justify-items:center;gap:6px;min-width:0;padding:12px 5px;border:1px solid rgba(167,139,250,.14);border-radius:12px;background:rgba(139,92,246,.045);text-align:center}
+.badge>span{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(196,181,253,.22);border-radius:11px;background:linear-gradient(145deg,#302044,#15101f);color:#d8b4fe;font-size:18px}
+.badge strong{font-size:10px}.badge small{font-size:8px;letter-spacing:.1em;color:#a78bfa}
+.community-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(167,139,250,.1)}
+.community-row:last-child{border-bottom:0}
+.community-row>div{display:grid;gap:4px;min-width:0}
+.community-row strong{font-size:11px}.community-row small{font-size:10px;color:var(--muted)}
+.post-game{display:inline-flex;align-items:center;gap:8px;color:var(--muted);font-size:10px}
+@media(max-width:760px){.temple-layer-runes span{width:22px;height:22px;font-size:10px}.temple-layer-orbits{opacity:.65}.badge-grid{gap:6px}}

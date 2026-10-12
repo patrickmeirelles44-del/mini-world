@@ -512,7 +512,6 @@ img{max-width:100%}
 @media(max-width:640px){.forge-temple-illustration{object-fit:cover;object-position:center 46%;opacity:.72}.forge-temple-art{inset:6% -1% 12%}}
 @media(prefers-reduced-motion:reduce){.forge-temple-illustration{animation:none}}
 
-
 /* FORGE / VISUAL TEST 01 — competitive editorial, flat UI, responsive */
 :root {
   color-scheme: dark;

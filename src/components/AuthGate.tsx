@@ -15,10 +15,40 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   const [reset, setReset] = useState(false);
 
   useEffect(() => {
-    if (!supabase) { setSession({ demo: true }); return; }
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data } = supabase.auth.onAuthStateChange((_event, next) => setSession(next));
-    return () => data.subscription.unsubscribe();
+    if (!supabase) {
+      setSession({ demo: true });
+      return;
+    }
+
+    let active = true;
+    const timeout = window.setTimeout(() => {
+      if (active) {
+        console.error("FORGE: auth initialization timed out; showing sign-in screen.");
+        setSession(null);
+      }
+    }, 5000);
+
+    supabase.auth
+      .getSession()
+      .then(({ data, error }) => {
+        if (error) console.error("FORGE getSession failed:", error);
+        if (active) setSession(data.session ?? null);
+      })
+      .catch((error) => {
+        console.error("FORGE auth initialization failed:", error);
+        if (active) setSession(null);
+      })
+      .finally(() => window.clearTimeout(timeout));
+
+    const { data } = supabase.auth.onAuthStateChange((_event, next) => {
+      if (active) setSession(next);
+    });
+
+    return () => {
+      active = false;
+      window.clearTimeout(timeout);
+      data.subscription.unsubscribe();
+    };
   }, []);
 
   if (session === undefined) return <div className="auth-screen"><div className="auth-card"><Gamepad2 size={28}/><p>Carregando FORGE...</p></div></div>;

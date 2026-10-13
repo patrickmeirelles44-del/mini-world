@@ -814,3 +814,42 @@ button { touch-action: manipulation; }
 @media (prefers-reduced-motion: reduce) {
   .home-welcome:after { display: none; }
 }
+
+/* FORGE social-first refinement — feed is the home, temple belongs to profile */
+.feed-heading { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin:0 0 18px; }
+.feed-heading h1,.profile-page-heading h1 { margin:7px 0 5px; font-size:clamp(25px,3vw,34px); line-height:1.05; letter-spacing:-.055em; }
+.feed-heading p,.profile-page-heading p { margin:0; color:#9299a7; font-size:13px; line-height:1.6; }
+.feed-profile-shortcut { display:inline-flex; align-items:center; justify-content:center; gap:5px; flex:0 0 auto; padding:10px 12px; border:1px solid #303541; border-radius:10px; color:#dce1ea; background:#12151b; font-size:12px; font-weight:700; }
+.feed-profile-shortcut:hover { border-color:#c7ff3d70; color:#c7ff3d; }
+.profile-page-heading { margin:0 0 18px; }
+.profile-page-heading h1 { font-size:clamp(28px,3.2vw,38px); }
+.profile-page .temple-card { margin-bottom:24px; }
+.profile-page .profile-sections { margin-top:0; }
+.profile-page .temple-customizer { border-color:color-mix(in srgb,var(--temple-accent) 55%,#2b303b); background:linear-gradient(135deg,#14151b,#0e1015); box-shadow:inset 3px 0 var(--temple-accent),0 10px 35px #0002; }
+.profile-page .theme-options button { border:1px solid #343844; border-radius:999px; transition:border-color .18s,background .18s,transform .18s; }
+.profile-page .theme-options button.active { border-color:var(--temple-accent); background:color-mix(in srgb,var(--temple-accent) 13%,#101218); box-shadow:0 0 0 1px color-mix(in srgb,var(--temple-accent) 22%,transparent),0 0 20px color-mix(in srgb,var(--temple-accent) 12%,transparent); }
+.profile-page .theme-options button:active { transform:scale(.97); }
+.profile-page .temple-customizer small { display:block; margin-top:7px; color:#9ba2b0; }
+.profile-page .temple-card:after { border-color:color-mix(in srgb,var(--temple-accent) 30%,transparent); }
+.profile-page .temple-slogan { border-left-color:var(--temple-accent); }
+.profile-page .temple-slogan span,.profile-page .temple-evolution > div:first-child b { color:var(--temple-accent); }
+.profile-page .evolution-track i { background:linear-gradient(90deg,var(--temple-accent),var(--temple-secondary)); }
+@media (max-width:850px) {
+ .feed-heading { align-items:center; }
+ .feed-heading h1 { font-size:26px; }
+ .feed-heading p { font-size:12px; }
+ .profile-page-heading { margin-bottom:14px; }
+ .profile-page .temple-card { margin-bottom:18px; }
+}
+@media (max-width:560px) {
+ .feed-heading { margin:1px 2px 15px; align-items:flex-start; }
+ .feed-heading h1 { font-size:24px; }
+ .feed-heading p { max-width:235px; font-size:11px; }
+ .feed-profile-shortcut { margin-top:16px; padding:9px 10px; font-size:11px; }
+ .profile-page-heading h1 { font-size:30px; }
+ .profile-page-heading p { font-size:12px; }
+ .profile-page .temple-card { margin-bottom:17px; }
+ .profile-page .temple-customizer { padding:14px; }
+ .profile-page .theme-options { display:flex; flex-wrap:wrap; }
+ .profile-page .theme-options button { min-height:38px; padding:8px 11px; }
+}

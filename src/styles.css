@@ -927,3 +927,8 @@ button { touch-action: manipulation; }
 .forge-story-author small{opacity:.75}
 @keyframes forge-story-timer{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @media(max-width:600px){.forge-story-viewer{padding:0}.forge-story-viewer-card{width:100%;height:100dvh;max-height:none;border-radius:0;border:0}}
+
+.forge-reaction-effects{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:10px 0 7px;padding-left:2px}
+.forge-reaction-effects button{width:31px;height:31px;border-radius:10px;border:1px solid #302b3b;background:#111018;color:#a9a1b7;font-size:18px;cursor:pointer;transition:transform .16s,border-color .16s,color .16s}
+.forge-reaction-effects button:hover,.forge-reaction-effects button.active{color:#c1ff36;border-color:#b7f52c;background:rgba(193,255,54,.08);transform:translateY(-1px)}
+.forge-reaction-effects button.active{box-shadow:0 0 13px rgba(193,255,54,.12)}
